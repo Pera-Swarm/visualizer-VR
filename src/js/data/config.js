@@ -11,9 +11,9 @@ export default {
         maxY: 140
     },
     mqtt: {
-        server: 'swarm-gui.tk',
+        server: 'webservices.ceykod.com',
         port: 8883,
-        path: '/socket.io',
+        path: '/mqtt',
         user: 'swarm_user',
         password: 'swarm_usere15',
         channel: 'v1'
