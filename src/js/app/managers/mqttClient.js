@@ -54,8 +54,6 @@ export default class MQTTClient {
         this.updateChannel();
         const credentials = getCredentials();
 
-        const credentials = getCredentials();
-
         if (credentials === -1) {
             alert('Unauthorized access! The Visualizer will not work properly.');
         } else {
@@ -265,20 +263,22 @@ export default class MQTTClient {
         } else {
         }
 
-        subscribe(topic, callback) {
-            const subTopic = window.channel + '/' + topic;
-            this.client.subscribe(subTopic);
-            console.log('MQTT: subscribed', subTopic);
-            if (callback != null) callback();
-        }
-
-        publish(topic, message, callback) {
-            var payload = new MQTT.Message(message);
-            const pubTopic = window.channel + '/' + topic;
-            payload.destinationName = pubTopic;
-            this.client.send(payload);
-            console.log('MQTT: published', pubTopic);
-
-            if (callback != null) callback();
-        }
     }
+
+    subscribe(topic, callback) {
+        const subTopic = window.channel + '/' + topic;
+        this.client.subscribe(subTopic);
+        console.log('MQTT: subscribed', subTopic);
+        if (callback != null) callback();
+    }
+
+    publish(topic, message, callback) {
+        var payload = new MQTT.Message(message);
+        const pubTopic = window.channel + '/' + topic;
+        payload.destinationName = pubTopic;
+        this.client.send(payload);
+        console.log('MQTT: published', pubTopic);
+
+        if (callback != null) callback();
+    }
+}

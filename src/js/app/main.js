@@ -84,12 +84,12 @@ export default class Main {
         // Set up Stats if dev environment
         if (Config.isDev && Config.isShowingStats) {
             this.stats = new Stats();
-            this.container.appendChild(this.stats.dom);
+            // this.container.appendChild(this.stats.dom);
         }
 
         if (Config.isShowingLables) {
             this.labelRenderer = label();
-            this.container.appendChild(this.labelRenderer.domElement);
+            // this.container.appendChild(this.labelRenderer.domElement);
         }
 
         // Set up gui
@@ -132,7 +132,8 @@ export default class Main {
             }
 
             var patternMarker = new THREEAR.PatternMarker({
-                patternUrl: './assets/data/hiro.patt',
+                patternUrl: './assets/data/pattern-kanji.patt',
+                // patternUrl: './assets/data/hiro.patt',
                 markerObject: markerGroup
             });
 
@@ -158,7 +159,7 @@ export default class Main {
                 // ----------------------
                 // Render rStats if Dev
                 if (Config.isDev && Config.isShowingStats) {
-                    Stats.start();
+                    // Stats.start();
                 }
 
                 // Call render function and pass in created scene and camera
@@ -166,14 +167,14 @@ export default class Main {
 
                 // render labels if enabled
                 if (Config.isShowingLables) {
-                    this.labelRenderer.domElement.hidden = false;
+                    // this.labelRenderer.domElement.hidden = false;
                 } else {
-                    this.labelRenderer.domElement.hidden = true;
+                    // this.labelRenderer.domElement.hidden = true;
                 }
-                this.labelRenderer.render(this.scene, camera.threeCamera);
+                // this.labelRenderer.render(this.scene, camera.threeCamera);
 
                 if (Config.isDev && Config.isShowingStats) {
-                     this.stats.update();
+                     // this.stats.update();
                  }
 
                 // Delta time is sometimes needed for certain updates

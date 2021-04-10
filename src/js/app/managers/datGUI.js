@@ -13,7 +13,7 @@ export default class DatGUI {
         this.gui.useLocalStorage = true;
 
         this.camera = main.camera.threeCamera;
-        this.controls = main.controls.threeControls;
+        // this.controls = main.controls.threeControls;
         this.light = main.light;
     }
 
@@ -112,7 +112,7 @@ export default class DatGUI {
     }
 
     show() {
-        this.gui.show();
+        // this.gui.show();
     }
 
     unload() {
