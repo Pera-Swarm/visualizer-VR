@@ -2,24 +2,24 @@ import * as THREE from 'three';
 import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
+import { addLabel, removeLabel } from './label';
 
-const OBSTACLE_PREFIX = 'obstacle_';
+const OBSTACLE_PREFIX = 'Obstacle_';
 
 export default class Obstacle {
     constructor(scene, callback) {
         this.scene = scene;
         this.scale = scene_scale;
 
-        if (callback != undefined) {
-            callback();
-        }
+        console.log('Obstacle Reality:', Config.mixedReality.obstacles);
+
+        if (callback !== undefined) callback();
     }
 
     // Create a given list of obstacles
     createList(obstacles) {
         Object.entries(obstacles).forEach((obs) => {
-            if (obs != undefined) {
-                //console.log(obs[1]);
+            if (obs !== undefined) {
                 this.create(obs[1]);
             }
         });
@@ -29,11 +29,31 @@ export default class Obstacle {
     create(obstacle) {
         const geometry = this.createGeometry(obstacle.geometry);
         const material = this.createMaterial(obstacle.material);
-        const id = obstacle.id || 1000 + Math.floor(900 * Math.random());
 
+        material.userData.originalColor = new THREE.Color(0x666666);
+        material.userData.labelVisibility = Config.isShowingLables && Config.labelsVisibility.obstacles;
+        material.userData.originalEmmisive = material.emissive.getHex();
+        material.selected = false;
+        material.transparent = true;
+
+        const id = obstacle.id || 1000 + Math.floor(900 * Math.random());
+        const reality = obstacle.reality == undefined ? 'V' : obstacle.reality;
         const mesh = new THREE.Mesh(geometry, material);
 
+        // TODO: add the name defined in env.config.json as discussed on 2021-02-18
+        //      Need some obstacle protocol revision + simulator updates
+        const name_temp = 'Obs_' + id.toString().substring(0, 8) + '...';
+
         mesh.name = OBSTACLE_PREFIX + id;
+        mesh.reality = reality; // set reality flag
+
+        if (mesh.reality === 'V') {
+            // material.visible = Config.selectedRealities.virtual;
+            material.opacity = Config.selectedRealities.virtual ? 1.0 : Config.hiddenOpacity;
+        } else if (mesh.reality === 'R') {
+            // material.visible = Config.selectedRealities.real;
+            material.opacity = Config.selectedRealities.real ? 1.0 : Config.hiddenOpacity;
+        }
 
         // Remove if object is already defined
         this.deleteIfExists(id);
@@ -42,7 +62,7 @@ export default class Obstacle {
         window.markerGroup.add(mesh);
 
         // update the position of the object
-        if (obstacle.position != undefined) {
+        if (obstacle.position !== undefined) {
             const { x, y } = obstacle.position;
             const z = this.calculateZ(obstacle);
             mesh.scale.set(this.scale, this.scale, this.scale);
@@ -59,8 +79,11 @@ export default class Obstacle {
             mesh.rotation.set(radX, radY, radZ);
         }
 
-        // Enable shadows for the object
+        // Show shadows of the object if enabled
         if (Config.shadow.enabled) mesh.receiveShadow = true;
+
+        // Add labels to every obstacle, immediately displayed if enabled
+        addLabel(OBSTACLE_PREFIX, { id: obstacle.id, name: name_temp }, mesh, Config.labelsVisibility.obstacles);
 
         console.log('Created>', mesh.name);
     }
@@ -70,13 +93,15 @@ export default class Obstacle {
 
         if (g.type == 'BoxGeometry') {
             return this.createBoxGeometry(g.width, g.height, g.depth);
+
         } else if (g.type == 'CylinderGeometry') {
             return this.createCylinderGeometry(g.radiusTop, g.radiusBottom, g.height);
+
         } else if (g.type == 'SphereGeometry') {
             return this.createSphereGeometry(g.radius);
-        } else {
-            throw new TypeError('unsupported geometry type');
         }
+        throw new TypeError('unsupported geometry type');
+
     }
 
     createBoxGeometry(width, height, depth) {
@@ -125,24 +150,24 @@ export default class Obstacle {
         } else if (m.type == 'MeshStandardMaterial') {
             // https://threejs.org/docs/#api/en/materials/MeshStandardMaterial
             return new THREE.MeshStandardMaterial(m.properties);
-        } else {
-            // Default material type
-            return new THREE.MeshStandardMaterial(m.properties);
         }
+        // Default material type
+        return new THREE.MeshStandardMaterial(m.properties);
+
     }
 
     calculateZ(obstacle) {
         // If z is undefined, place the object in top of the arena
         if (obstacle.position.z == undefined) {
-            if (obstacle.geometry.height != undefined) {
+            if (obstacle.geometry.height !== undefined) {
                 // Box and Cylinder objects
                 return obstacle.geometry.height / 2;
-            } else if (obstacle.geometry.radius != undefined) {
+            } else if (obstacle.geometry.radius !== undefined) {
                 // Sphere objects
                 return obstacle.geometry.radius;
-            } else {
-                return 0;
             }
+            return 0;
+
         }
         return obstacle.position.z;
     }
@@ -152,9 +177,10 @@ export default class Obstacle {
 
         const name = OBSTACLE_PREFIX + id;
         const obstacle = window.markerGroup.getObjectByName(name);
-
-        if (obstacle != undefined) {
+        
+        if (obstacle !== undefined) {
             window.markerGroup.remove(obstacle);
+            removeLabel(obj[1]);
             console.log('Deleted>', name);
         }
     }

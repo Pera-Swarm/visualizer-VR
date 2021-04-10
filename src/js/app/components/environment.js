@@ -4,6 +4,8 @@ import Config from '../../data/config';
 
 export default class Environment {
     constructor() {
+        console.log(`Environment: Scale: ${scene_scale}, arenaSize:${Config.arena.size}`);
+
         var geometry = new THREE.PlaneBufferGeometry(Config.arena.size, Config.arena.size);
         var material = new THREE.MeshPhongMaterial({
             color: 0x999999,

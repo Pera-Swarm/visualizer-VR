@@ -1,15 +1,16 @@
 import * as THREE from 'three';
 
 import OrbitControls from '../../utils/orbitControls';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
 import Config from '../../data/config';
 
 // Controls based on orbit controls
 export default class Controls {
     constructor(camera, container) {
         // Orbit controls first needs to pass in THREE to constructor
-        const orbitControls = new OrbitControls(THREE);
+        // const orbitControls = new OrbitControls(THREE);
         this.threeControls = new orbitControls(camera, container);
-
         this.init();
     }
 

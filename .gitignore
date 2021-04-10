@@ -9,3 +9,5 @@ gh-pages-actions.pub
 
 src/public/css
 src/public/js/app.js
+src/public/js/main.app.js
+src/public/js/vendors.app.js

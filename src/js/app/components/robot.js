@@ -2,15 +2,17 @@ import * as THREE from 'three';
 import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
+import { addLabel, removeLabel } from './label';
 
 var STLLoader = require('three-stl-loader')(THREE);
 
-const ROBOT_PREFIX = 'robot_';
+const ROBOT_PREFIX = 'Robot_';
 
 export default class Robot {
     constructor(scene) {
         this.scene = scene;
         this.scale = scene_scale;
+        console.log('Robot Reality:', Config.mixedReality.robots);
     }
 
     changeColor(id, R, G, B, ambient, callback) {
@@ -18,49 +20,85 @@ export default class Robot {
         if (r != undefined) {
             r.material.color.setRGB(R / 256, G / 256, B / 265);
             //console.log("Color> id:", id, " | R:", R, "G:", G, "B:", B);
-
-            if (callback != null) callback('success');
+            if (callback !== null) callback('success');
         } else {
-            if (callback != null) callback('undefined');
+            if (callback !== null) callback('undefined');
         }
 
         return r;
     }
 
-    create(id, x, y, heading, callback) {
+    create(id, x, y, heading, reality = 'V',callback) {
         var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
+        const REALITY = Config.mixedReality.robots;
+
         if (r == undefined) {
             // Create only if not exists
 
-            // Limit the arena that robot can go
-            x = this.scale * Math.min(Math.max(x, Config.arena.minX), Config.arena.maxX);
-            y = this.scale * Math.min(Math.max(y, Config.arena.minY), Config.arena.maxY);
+            if (reality === REALITY || REALITY === 'M') {
 
-            var loader = new STLLoader();
-            loader.load('./assets/models/model.stl', function (geometry, scene) {
-                const material = new THREE.MeshStandardMaterial({ color: 0x666666 });
-                const scale = window.scene_scale || 0.1;
+                // Limit the arena that robot can go
+                x = this.scale * Math.min(Math.max(x, Config.arena.minX), Config.arena.maxX);
+                y = this.scale * Math.min(Math.max(y, Config.arena.minY), Config.arena.maxY);
 
-                console.log('scale', scale);
-                var r = new THREE.Mesh(geometry, material);
-                r.receiveShadow = true;
-                r.name = ROBOT_PREFIX + id;
-                r.scale.set(scale, scale, scale);
-                r.position.set(x, 0, -1 * y);
-                //r.rotation.x = -90 * THREE.Math.DEG2RAD;
-                r.rotation.y = (heading - 90) * THREE.Math.DEG2RAD;
+                var loader = new STLLoader();
+                loader.load('./assets/models/model.stl', function (geometry, scene) {
+                    const material = new THREE.MeshStandardMaterial(
+                        { color: 0x666666,opacity: opacity,transparent: true });
+                        material.userData.originalColor = new THREE.Color(0x666666);
+                        material.userData.labelVisibility = Config.isShowingLables && Config.labelsVisibility.robots;
+                        material.selected = false;
 
-                window.markerGroup.add(r);
+                        const scale = window.scene_scale || 0.1;
 
-                r.clickEvent = function (m) {
-                    window.robot.alert(m);
-                };
+                        console.log('scale', scale);
+                        var r = new THREE.Mesh(geometry, material);
+                        r.receiveShadow = true;
+                        r.robotId = id;
+                        r.name = ROBOT_PREFIX + id;
+                        r.scale.set(scale, scale, scale);
+                        r.position.set(x, 0, -1 * y);
+                        //r.rotation.x = -90 * THREE.Math.DEG2RAD;
+                        r.rotation.y = (heading - 90) * THREE.Math.DEG2RAD;
+                        r.reality = reality; // set reality flag
 
-                console.log('Created> Robot: id:', id, ' | x:', x, 'y:', y, 'heading:', heading);
+                        if (reality === 'V') {
+                            // material.visible = Config.selectedRealities.virtual;
+                            material.opacity = Config.selectedRealities.virtual ? 1.0 : Config.hiddenOpacity;
+                        } else if (reality === 'R') {
+                            // material.visible = Config.selectedRealities.real;
+                            material.opacity = Config.selectedRealities.real ? 1.0 : Config.hiddenOpacity;
+                        }
 
+                        window.markerGroup.add(r);
+
+                        r.clickEvent = function (m) {
+                            window.robot.alert(m);
+                        };
+
+                        // Add labels to every robot, immediately displayed if enabled
+                        addLabel(ROBOT_PREFIX, { id, name: r.name }, r, Config.labelsVisibility.robots);
+
+                        console.log('Created> Robot: id:', id, ' | x:', x, 'y:', y, 'heading:', heading);
+
+                    } else {
+                        console.error(`Creation Failed> Robot: id:${id}  reality: ${reality}!=${REALITY}`);
+                    }
+                });
+
+            }else if (reality === REALITY || REALITY === 'M') {
+                // Reality matches
+
+                this.setReality(id, reality);
                 // Callback function
                 if (callback != undefined) callback('success');
-            });
+
+            }else{
+                // Robot reality not matching with environment reality
+                this.delete(id);
+                // Callback function
+                if (callback != undefined) callback('deleted');
+            }
         } else {
             this.move(id, x, y, heading, () => {
                 if (callback != undefined) callback('already defined, so moved');
@@ -76,6 +114,7 @@ export default class Robot {
             if (r != undefined) {
                 scene.remove(r);
                 console.log('Deleted> id:', id);
+                removeLabel(obj[1]);
                 if (callback != undefined) callback('success');
             } else {
                 if (callback != undefined) callback('not found');
@@ -94,6 +133,7 @@ export default class Robot {
 
             if (name.startsWith(ROBOT_PREFIX)) {
                 console.log('Deleted>', name);
+                removeLabel(obj[1]);
                 window.markerGroup.remove(obj[1]);
             }
         });
@@ -128,25 +168,25 @@ export default class Robot {
 
             if (distance != 0) {
                 var tween = new TWEEN.Tween(position)
-                    .to({ x: x, y: y, heading: newHeading }, 1000 * moveTime)
-                    /*.easing(TWEEN.Easing.Quartic.InOut)*/
-                    .onUpdate(function () {
-                        r.position.x = position.x;
-                        r.position.z = position.y;
+                .to({ x: x, y: y, heading: newHeading }, 1000 * moveTime)
+                /*.easing(TWEEN.Easing.Quartic.InOut)*/
+                .onUpdate(function () {
+                    r.position.x = position.x;
+                    r.position.z = position.y;
 
-                        if (rotationFlag) {
-                            r.rotation.y = position.heading;
-                        } else {
-                            //console.log(currentHeading, newHeading);
-                        }
-                    })
-                    .onComplete(() => {
-                        //console.log('Moved> id:',id,'x:',x,'y:',y,'heading:',heading);
+                    if (rotationFlag) {
                         r.rotation.y = position.heading;
-                        if (callback != null) callback('success');
-                    })
-                    .delay(50)
-                    .start();
+                    } else {
+                        //console.log(currentHeading, newHeading);
+                    }
+                })
+                .onComplete(() => {
+                    //console.log('Moved> id:',id,'x:',x,'y:',y,'heading:',heading);
+                    r.rotation.y = position.heading;
+                    if (callback != null) callback('success');
+                })
+                .delay(50)
+                .start();
             } else {
                 // No move, only the rotation
                 r.rotation.y = newHeading;
@@ -162,26 +202,44 @@ export default class Robot {
         if (r != undefined) {
             console.log(`${r.position.x},${r.position.y},${r.position.z}`);
             return r;
-        } else {
-            return null;
         }
+        return null;
     }
 
     update() {
         TWEEN.update();
     }
 
+    requestSnapshot(mesh) {
+        return new Promise((resolve, reject) => {
+            // TODO: Review this
+            const req = window.mqtt.publish(
+                window.channel + '/mgt/robots/snapshot',
+                JSON.stringify({ id: mesh.robotId })
+            );
+            resolve(!req);
+        });
+    }
+
     alert(mesh) {
         // Display an alert on window
-
-        //alert(mesh.name);
-        //console.log(mesh)
-        let disp = document.querySelector('#msg-box');
-        disp.innerHTML = mesh.name;
+        const disp = document.querySelector('#msg-box');
+        const prevContent = document.getElementById('msg-content');
+        let content = document.createElement('div');
+        content.setAttribute('id', 'msg-content');
+        let nodeContent;
+        if (Config.isShowingRobotSnapshots) {
+            nodeContent = document.createTextNode(`${mesh.name} Snapshot Loading...`);
+            this.requestSnapshot(mesh);
+        } else {
+            nodeContent = document.createTextNode(`${mesh.name}`);
+        }
+        content.appendChild(nodeContent);
+        disp.replaceChild(content, prevContent);
         disp.style.display = 'block';
-
         setTimeout(function () {
-            document.querySelector('#msg-box').style.display = 'none';
-        }, 1000);
+            disp.style.opacity = '1.0';
+            disp.style.display = 'none';
+        }, 10000);
     }
 }
