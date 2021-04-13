@@ -6,7 +6,7 @@ import TWEEN, { update } from '@tweenjs/tween.js';
 
 // Components
 import Renderer from './components/renderer';
-import label from './components/label';
+import Label from './components/label';
 import Camera from './components/camera';
 import Light from './components/light';
 import Controls from './components/controls';
@@ -88,8 +88,8 @@ export default class Main {
         }
 
         if (Config.isShowingLables) {
-            this.labelRenderer = label();
-            // this.container.appendChild(this.labelRenderer.domElement);
+            this.labelRenderer = Label();
+            this.container.appendChild(this.labelRenderer.domElement);
         }
 
         // Set up gui
@@ -132,8 +132,8 @@ export default class Main {
             }
 
             var patternMarker = new THREEAR.PatternMarker({
-                patternUrl: './assets/data/pattern-kanji.patt',
                 // patternUrl: './assets/data/hiro.patt',
+                patternUrl: './assets/data/pattern-kanji.patt',
                 markerObject: markerGroup
             });
 
@@ -279,73 +279,75 @@ export default class Main {
     onDocumentMouseDown(event) {
         event.preventDefault();
 
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera(mouse, camera);
-
-        const intersects = raycaster.intersectObjects(scene.children);
-
-        if (intersects.length > 0) {
-            const object = intersects[0].object;
-            if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
-            INTERSECTED = object;
-            selectedLabel = INTERSECTED.children[0];
-            INTERSECTED.currentOpacity = INTERSECTED.material.opacity;
-            INTERSECTED.labelsVisibility = INTERSECTED.material.labelVisibility;
-            if (selectedLabel !== undefined && selectedLabel.visible !== undefined && Config.isShowingLables) {
-                selectedLabel.visible = !selectedLabel.visible;
-            }
-            INTERSECTED.material.selected = !INTERSECTED.material.selected;
-            // Obstacle selection event handling
-            if (INTERSECTED.name.startsWith('Obstacle')) {
-                if (INTERSECTED.material.selected) {
-                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-                    INTERSECTED.material.emissive.setHex(0xf95f4a);
-                } else {
-                    INTERSECTED.currentHex = INTERSECTED.material.userData.originalEmmisive;
-                    INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-                }
-                // Robot selection event handling
-            } else if (INTERSECTED.name.startsWith('Robot')) {
-                if (INTERSECTED.material.selected) {
-                    INTERSECTED.material.setValues({ opacity: 0.5 });
-                } else {
-                    INTERSECTED.material.setValues({ opacity: 1 });
-                }
-                if (INTERSECTED.clickEvent !== undefined) {
-                    INTERSECTED.clickEvent(INTERSECTED);
-                }
-            }
-        } else {
-            if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
-            INTERSECTED = null;
-        }
+        // // Not suppported in AR so far
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //
+        // raycaster.setFromCamera(mouse, camera);
+        //
+        // const intersects = raycaster.intersectObjects(scene.children);
+        //
+        // if (intersects.length > 0) {
+        //     const object = intersects[0].object;
+        //     if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
+        //     INTERSECTED = object;
+        //     selectedLabel = INTERSECTED.children[0];
+        //     INTERSECTED.currentOpacity = INTERSECTED.material.opacity;
+        //     INTERSECTED.labelsVisibility = INTERSECTED.material.labelVisibility;
+        //     if (selectedLabel !== undefined && selectedLabel.visible !== undefined && Config.isShowingLables) {
+        //         selectedLabel.visible = !selectedLabel.visible;
+        //     }
+        //     INTERSECTED.material.selected = !INTERSECTED.material.selected;
+        //     // Obstacle selection event handling
+        //     if (INTERSECTED.name.startsWith('Obstacle')) {
+        //         if (INTERSECTED.material.selected) {
+        //             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        //             INTERSECTED.material.emissive.setHex(0xf95f4a);
+        //         } else {
+        //             INTERSECTED.currentHex = INTERSECTED.material.userData.originalEmmisive;
+        //             INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+        //         }
+        //         // Robot selection event handling
+        //     } else if (INTERSECTED.name.startsWith('Robot')) {
+        //         if (INTERSECTED.material.selected) {
+        //             INTERSECTED.material.setValues({ opacity: 0.5 });
+        //         } else {
+        //             INTERSECTED.material.setValues({ opacity: 1 });
+        //         }
+        //         if (INTERSECTED.clickEvent !== undefined) {
+        //             INTERSECTED.clickEvent(INTERSECTED);
+        //         }
+        //     }
+        // } else {
+        //     if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
+        //     INTERSECTED = null;
+        // }
     }
 
     onDocumentMouseMove(event) {
         event.preventDefault();
 
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera(mouse, camera.threeCamera);
-
-        const intersects = raycaster.intersectObjects(scene.children, true);
-        if (intersects.length > 0) {
-            const object = intersects[0].object;
-            if (INTERSECTED !== object) {
-                if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
-                INTERSECTED = object;
-                selectedLabel = INTERSECTED.children[0];
-                INTERSECTED.currentOpacity = INTERSECTED.material.opacity;
-                INTERSECTED.currentColor = INTERSECTED.material.opacity;
-                INTERSECTED.material.setValues({ color: 0x03dffc, opacity: 0.75 });
-            }
-        } else {
-            if (INTERSECTED)
-            INTERSECTED.material.setValues({ opacity: 1.0, color: INTERSECTED.material.userData.originalColor });
-            INTERSECTED = null;
-        }
+        // // Not suppoprted in AR so far
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //
+        // raycaster.setFromCamera(mouse, camera.threeCamera);
+        //
+        // const intersects = raycaster.intersectObjects(scene.children, true);
+        // if (intersects.length > 0) {
+        //     const object = intersects[0].object;
+        //     if (INTERSECTED !== object) {
+        //         if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
+        //         INTERSECTED = object;
+        //         selectedLabel = INTERSECTED.children[0];
+        //         INTERSECTED.currentOpacity = INTERSECTED.material.opacity;
+        //         INTERSECTED.currentColor = INTERSECTED.material.opacity;
+        //         INTERSECTED.material.setValues({ color: 0x03dffc, opacity: 0.75 });
+        //     }
+        // } else {
+        //     if (INTERSECTED)
+        //     INTERSECTED.material.setValues({ opacity: 1.0, color: INTERSECTED.material.userData.originalColor });
+        //     INTERSECTED = null;
+        // }
     }
 }

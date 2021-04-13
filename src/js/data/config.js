@@ -4,7 +4,7 @@ let resolvedConfig;
 
 // This object contains the state of the app
 const config = {
-    scale: 0.025,
+    scale: 0.015,
     arena: {
         size: 180,
         minX: -85,

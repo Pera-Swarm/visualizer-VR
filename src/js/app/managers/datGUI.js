@@ -45,13 +45,15 @@ export default class DatGUI {
         .add(Config.labelsVisibility, 'obstacles')
         .name('Obstacle Labels')
         .onChange((value) => {
-            this.toggleLabels(this.scene.children, 'Obstacle', value);
+            // this.toggleLabels(this.scene.children, 'Obstacle', value);
+            this.toggleLabels(window.markerGroup.children, 'Obstacle', value);
         });
         labelsFolder
         .add(Config.labelsVisibility, 'robots')
         .name('Robot Labels')
         .onChange((value) => {
-            this.toggleLabels(this.scene.children, 'Robot', value);
+            // this.toggleLabels(this.scene.children, 'Robot', value);
+            this.toggleLabels(window.markerGroup.children, 'Robot', value);
         });
 
         /* Reality Folder */

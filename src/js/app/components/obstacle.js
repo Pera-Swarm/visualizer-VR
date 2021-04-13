@@ -3,6 +3,7 @@ import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
 import { addLabel, removeLabel } from './label';
+import {transformPosition, transformScale, transformRotation} from '../helpers/coordinateTransform';
 
 const OBSTACLE_PREFIX = 'Obstacle_';
 
@@ -65,8 +66,12 @@ export default class Obstacle {
         if (obstacle.position !== undefined) {
             const { x, y } = obstacle.position;
             const z = this.calculateZ(obstacle);
-            mesh.scale.set(this.scale, this.scale, this.scale);
-            mesh.position.set(this.scale * x, this.scale * z, -1 * this.scale * y);
+
+            const {posX, posY, posZ } = transformPosition(x,y,z, this.scale);
+            const {scaleX, scaleY, scaleZ } = transformScale(this.scale);
+
+            mesh.position.set(posX, posY, posZ);
+            mesh.scale.set(scaleX, scaleY, scaleZ);
         }
 
         // Rotate the object, after translate degrees into radians
@@ -76,7 +81,8 @@ export default class Obstacle {
             const radY = (y / 360) * 2 * Math.PI;
             const radZ = (z / 360) * 2 * Math.PI;
 
-            mesh.rotation.set(radX, radY, radZ);
+            const {rotX, rotY, rotZ } = transformRotation(radX, radY, radZ);
+            mesh.rotation.set(rotX, rotY,rotZ);
         }
 
         // Show shadows of the object if enabled
@@ -177,7 +183,7 @@ export default class Obstacle {
 
         const name = OBSTACLE_PREFIX + id;
         const obstacle = window.markerGroup.getObjectByName(name);
-        
+
         if (obstacle !== undefined) {
             window.markerGroup.remove(obstacle);
             removeLabel(obj[1]);
