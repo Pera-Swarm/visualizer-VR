@@ -12,6 +12,14 @@ const config = {
         minY: -85,
         maxY: 85
     },
+    offsets:{
+        x: 0,
+        y: 0,
+        z: 0,
+        showZeroMarker: true,
+        showCoordMarker: true,
+        scaleRange: 360
+    },
     mqtt: {
         server: localStorage.getItem(document.location.href.split('?')[0] + '.server') || 'webservices.ceykod.com',
         port: localStorage.getItem(document.location.href.split('?')[0] + '.port') || 8883,
@@ -27,7 +35,7 @@ const config = {
         real: true,
         virtual: true
     },
-    hiddenOpacity: 0.3,
+    hiddenOpacity: 0.15,
     isDev: true,
     isShowingStats: true,
     isShowingLables: true,

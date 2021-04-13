@@ -3,6 +3,7 @@ import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
 import { addLabel, removeLabel } from './label';
+import {transformPosition, transformScale, transformRotation} from '../helpers/coordinateTransform';
 
 var STLLoader = require('three-stl-loader')(THREE);
 
@@ -15,7 +16,7 @@ export default class Robot {
         console.log('Robot Reality:', Config.mixedReality.robots);
     }
 
-    changeColor(id, R, G, B, ambient, callback) {
+    changeColor(id, R, G, B, callback) {
         var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
         if (r !== undefined) {
             r.material.color.setRGB(R / 256, G / 256, B / 265);
@@ -36,8 +37,9 @@ export default class Robot {
             if (reality === REALITY || REALITY === 'M') {
 
                 // Limit the arena that robot can go
-                x = this.scale * Math.min(Math.max(x, Config.arena.minX), Config.arena.maxX);
-                y = this.scale * Math.min(Math.max(y, Config.arena.minY), Config.arena.maxY);
+                x = Math.min(Math.max(x, Config.arena.minX), Config.arena.maxX);
+                y = Math.min(Math.max(y, Config.arena.minY), Config.arena.maxY);
+                const opacity = 1; // reality == 'V' ? 0.5 : 1;
 
                 var loader = new STLLoader();
                 loader.load('./assets/models/model.stl', function (geometry, scene) {
@@ -49,15 +51,18 @@ export default class Robot {
 
                         const scale = window.scene_scale || 0.1;
 
-                        console.log('scale', scale);
+                        const {posX, posY, posZ } = transformPosition(x,y, 0, scale);
+                        const {rotX, rotY, rotZ } = transformRotation(0,0,0);
+                        const {scaleX, scaleY, scaleZ } = transformScale(scale);
+
+                        // console.log('scale', scale);
                         var r = new THREE.Mesh(geometry, material);
                         r.receiveShadow = true;
                         r.robotId = id;
                         r.name = ROBOT_PREFIX + id;
-                        r.scale.set(scale, scale, scale);
-                        r.position.set(x, 0, -1 * y);
-                        //r.rotation.x = -90 * THREE.Math.DEG2RAD;
-                        r.rotation.y = (heading - 90) * THREE.Math.DEG2RAD;
+                        r.scale.set(scaleX, scaleY, scaleZ);
+                        r.position.set(posX, posY, posZ);
+                        r.rotation.set(rotX, rotY, rotZ ); //.y = (heading - 90) * THREE.Math.DEG2RAD;
                         r.reality = reality; // set reality flag
 
                         if (reality === 'V') {
@@ -147,23 +152,26 @@ export default class Robot {
                 const rotationFlag = currentHeading * newHeading >= 0 ? true : false;
 
                 // Limit the arena that robot can go
-                x = this.scale * Math.min(Math.max(Math.round(x * 10) / 10, Config.arena.minX), Config.arena.maxX);
-                y = -1 * this.scale * Math.min(Math.max(Math.round(y * 10) / 10, Config.arena.minY), Config.arena.maxY);
+                x = Math.min(Math.max(Math.round(x * 10) / 10, Config.arena.minX), Config.arena.maxX);
+                y = Math.min(Math.max(Math.round(y * 10) / 10, Config.arena.minY), Config.arena.maxY);
                 heading = Math.round(heading * 10) / 10;
 
+                const {posX, posY, posZ } = transformPosition(x,y, 0, scale);
+                const {rotX, rotY, rotZ } = transformRotation(0,0,0);
+
                 // const speed = 10;
-                const distance = Math.sqrt(Math.pow(x - position.x, 2) + Math.pow(y - position.y, 2));
+                const distance = Math.sqrt(Math.pow(posX - position.x, 2) + Math.pow(posY - position.y, 2));
 
                 const moveTime = 1; //distance / speed;
                 // TODO: If distance is 0, need to handle only the rotation
 
                 if (distance !== 0) {
                     var tween = new TWEEN.Tween(position)
-                    .to({ x: x, y: y, heading: newHeading }, 1000 * moveTime)
+                    .to({ x: posX, y: posY, heading: newHeading }, 1000 * moveTime)
                     /*.easing(TWEEN.Easing.Quartic.InOut)*/
                     .onUpdate(function () {
                         r.position.x = position.x;
-                        r.position.z = position.y;
+                        r.position.y = position.y;
 
                         if (rotationFlag) {
                             r.rotation.y = position.heading;

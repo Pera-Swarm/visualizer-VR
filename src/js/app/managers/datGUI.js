@@ -1,4 +1,5 @@
 import Config, { saveConfig } from '../../data/config';
+import {transformPosition, transformScale, transformRotation} from '../helpers/coordinateTransform';
 
 // COMMENT(NuwanJ)
 // Store the last state of the toggles in the window.localStorage
@@ -12,13 +13,16 @@ export default class DatGUI {
 
         this.gui.useLocalStorage = true;
 
-        this.camera = main.camera.threeCamera;
+        // this.camera = main.camera.threeCamera;
         // this.controls = main.controls.threeControls;
-        this.light = main.light;
+        // this.light = main.light;
     }
 
     load(main, mesh) {
 
+        const offsetRange = parseInt(Config.offsets.scaleRange);
+
+        // ---------------------------------------------------------------------
         // Add folders
         this.gui
         .add(Config, 'isShowingRobotSnapshots')
@@ -27,6 +31,7 @@ export default class DatGUI {
             Config.isShowingRobotSnapshots = value;
             saveConfig(Config);
         });
+
         /* Labels Folder */
         const labelsFolder = this.gui.addFolder('Labels');
         labelsFolder
@@ -41,21 +46,25 @@ export default class DatGUI {
             saveConfig(Config);
         });
 
-        labelsFolder
-        .add(Config.labelsVisibility, 'obstacles')
-        .name('Obstacle Labels')
-        .onChange((value) => {
-            // this.toggleLabels(this.scene.children, 'Obstacle', value);
-            this.toggleLabels(window.markerGroup.children, 'Obstacle', value);
-        });
-        labelsFolder
-        .add(Config.labelsVisibility, 'robots')
-        .name('Robot Labels')
-        .onChange((value) => {
-            // this.toggleLabels(this.scene.children, 'Robot', value);
-            this.toggleLabels(window.markerGroup.children, 'Robot', value);
-        });
+        // ---------------------------------------------------------------------
+        // labelsFolder
+        // .add(Config.labelsVisibility, 'obstacles')
+        // .name('Obstacle Labels')
+        // .onChange((value) => {
+        //     // this.toggleLabels(this.scene.children, 'Obstacle', value);
+        //     // alert('Obstacle Label');
+        //     this.toggleLabels(window.markerGroup.children, 'Obstacle', value);
+        // });
+        // labelsFolder
+        // .add(Config.labelsVisibility, 'robots')
+        // .name('Robot Labels')
+        // .onChange((value) => {
+        //     // this.toggleLabels(this.scene.children, 'Robot', value);
+        //     // alert('Robot Label');
+        //     this.toggleLabels(window.markerGroup.children, 'Robot', value);
+        // });
 
+        // ---------------------------------------------------------------------
         /* Reality Folder */
         const realityFolder = this.gui.addFolder('Reality');
 
@@ -65,6 +74,7 @@ export default class DatGUI {
         .listen()
         .onChange((value) => {
             this.toggleReality('real', 'R');
+            saveConfig(Config);
         });
         realityFolder
         .add(Config.selectedRealities, 'virtual')
@@ -72,12 +82,82 @@ export default class DatGUI {
         .listen()
         .onChange((value) => {
             this.toggleReality('virtual', 'V');
+            saveConfig(Config);
         });
 
-        this.gui.open();
+        // ---------------------------------------------------------------------
+        const placeFolder = this.gui.addFolder('Placement');
+
+        // Toggle visibility of Zero marker (yellow)
+        placeFolder
+        .add(Config.offsets, 'showZeroMarker')
+        .name('Zero Marker')
+        .listen()
+        .onChange((value) => {
+            saveConfig(Config);
+            window.zeroMarker.visible = value;
+        });
+
+        // Toggle visibility of Coord marker (red)
+        placeFolder
+        .add(Config.offsets, 'showCoordMarker')
+        .name('Coordinate Marker')
+        .listen()
+        .onChange((value) => {
+            saveConfig(Config);
+            window.coordMarker.visible = value;
+        });
+        // ---------------------------------------------------------------------
+        // X Offset
+        placeFolder
+        .add(Config.offsets, 'x')
+        .min(-1*parseInt(360))
+        .max(parseInt(360))
+        .name('X Offset')
+        .listen()
+        .onChange((value)=>{
+            Config.offsets.x = value
+            this.updateCoord();
+            saveConfig(Config);
+        });
+        // Y Offset
+        placeFolder
+        .add(Config.offsets, 'y')
+        .min(-1*parseInt(360))
+        .max(parseInt(360))
+        .name('Y Offset')
+        .listen()
+        .onChange((value)=>{
+            Config.offsets.y = value
+            this.updateCoord();
+            saveConfig(Config);
+        });
+        // Z Offset
+        placeFolder
+        .add(Config.offsets, 'z')
+        .min(-1*parseInt(360))
+        .max(parseInt(360))
+        .name('Z Offset')
+        .listen()
+        .onChange((value)=>{
+            Config.offsets.z = value
+            this.updateCoord();
+            saveConfig(Config);
+        });
+        // Scale Offset
+        placeFolder
+        .add(Config, 'scale', 0, 0.05)
+        .name('Scale')
+        .listen()
+        .onChange((value)=>{
+            Config.offsets.scale = value
+            window.coordMarker.scale.set(value,value,value);
+            saveConfig(Config);
+        });
 
         /* Global */
-        //this.gui.close();
+        this.gui.open();
+        // this.gui.close();
 
         // this.model = main.model;
         // this.meshHelper = main.meshHelper;
@@ -97,7 +177,8 @@ export default class DatGUI {
     toggleReality(reality, selected) {
         // by default visualizer will intercept all the communication coming to the channel regardless of the reality.
         // this control panel will only toggle the 'visibility' of objects in the selected realities.
-        const objects = scene.children;
+        const objects = window.markerGroup.children;
+
         saveConfig(Config);
         Object.entries(objects).forEach((obj) => {
             const name = obj[1]['name'];
@@ -111,6 +192,13 @@ export default class DatGUI {
                 obj[1].material.opacity = Config.selectedRealities.virtual ? 1.0 : Config.hiddenOpacity;
             }
         });
+    }
+
+
+    updateCoord(){
+        const pos = window.coordMarker.position;
+        const {posX, posY, posZ } = transformPosition(pos.x,pos.y,pos.z, scene_scale);
+        window.coordMarker.position.set(posX, posY, posZ);
     }
 
     show() {

@@ -1,6 +1,11 @@
+import Config from '../../data/config';
 
 export function transformPosition(x,y,z, scale) {
-    return {posX:scale * x, posY:-1*scale * y, posZ:-1*scale*z};
+    const tx = 0.01*Config.offsets.x + scale*(x);
+    const ty = 0.01*Config.offsets.y + scale*(-y + Math.abs(Config.arena.minY) );  // actual Y axis
+    const tz = 0.01*Config.offsets.z + scale*(-z); // actual Z axis
+
+    return {posX: tx, posY:ty, posZ:tz};
 }
 export function transformScale(scale) {
     return {scaleX:scale, scaleY:scale, scaleZ:scale};

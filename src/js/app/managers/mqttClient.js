@@ -89,9 +89,8 @@ export default class MQTTClient {
                     this.subscribe(TOPIC_MANAGEMENT_SNAPSHOT);
 
                     // Request for obstacle data
-                    // this.publish(TOPIC_OBSTACLE_REQUEST, Config.mixedReality.obstacles);
-                    this.publish(TOPIC_OBSTACLE_REQUEST, 'M');
-
+                    this.publish(TOPIC_OBSTACLE_REQUEST, Config.mixedReality.obstacles);
+                    
                     // Request for coordinate data
                     this.publish(TOPIC_LOC_REQUEST, Config.mixedReality.robots);
 
@@ -205,7 +204,7 @@ export default class MQTTClient {
         } else if (topic == TOPIC_CHANGE_COLOR) {
             try {
                 const data = JSON.parse(msg);
-                window.robot.changeColor(data.id, data.R, data.G, data.B, data.ambient);
+                window.robot.changeColor(data.id, data.R, data.G, data.B);
             } catch (e) {
                 console.error(e);
             }

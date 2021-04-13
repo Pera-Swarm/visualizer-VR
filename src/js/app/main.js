@@ -89,6 +89,7 @@ export default class Main {
 
         if (Config.isShowingLables) {
             this.labelRenderer = Label();
+            window.labelRenderer = this.labelRenderer; // add to global scope
             this.container.appendChild(this.labelRenderer.domElement);
         }
 
@@ -167,11 +168,12 @@ export default class Main {
 
                 // render labels if enabled
                 if (Config.isShowingLables) {
-                    // this.labelRenderer.domElement.hidden = false;
+                    window.labelRenderer.domElement.hidden = false;
                 } else {
-                    // this.labelRenderer.domElement.hidden = true;
+                    window.labelRenderer.domElement.hidden = true;
                 }
-                // this.labelRenderer.render(this.scene, camera.threeCamera);
+
+                // window.labelRenderer.render(scene, camera.threeCamera);
 
                 if (Config.isDev && Config.isShowingStats) {
                      // this.stats.update();
