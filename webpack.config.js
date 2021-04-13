@@ -152,6 +152,7 @@ module.exports = (env) => {
                     { from: 'node_modules/three/examples/js/libs/dat.gui.min.js' },
                     { from: 'src/public/assets/favicon.ico', to: '../favicon.ico' },
                     { from: 'src/public/instructions.html', to: '../instructions/index.html' }
+                    { from: 'src/public/instructions/kanji-marker.png', to: '../instructions/kanji-marker.png' }
                 ]
             })
         ),

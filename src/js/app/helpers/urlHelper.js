@@ -20,33 +20,38 @@ export function getCredentials() {
     // TODO: Add channel, host and port into URL (as optional parameters)
     // Suggestion: Use JWT insted of exposed credentials
     // Simulator server can provide the JWT token
-    const storedCredentials = localStorage.getItem(document.location.href.split('?')[0] + '.credentials');
+
+    const storedCredentials = localStorage.getItem('pera-swarm-credentials');
+
     const username = getUrlParam('username', false);
     const password = getUrlParam('password', false);
     const key = getUrlParam('key', false);
     const channel = getUrlParam('channel', false);
     const port = getUrlParam('port', false);
     const server = getUrlParam('server', false);
+
     clearParams();
+
     setTimeout(() => {
         if (server !== false) {
-            localStorage.setItem(document.location.href.split('?')[0] + '.server', server);
+            localStorage.setItem('pera-swarm-server', server);
         }
         if (channel !== false) {
-            localStorage.setItem(document.location.href.split('?')[0] + '.channel', channel);
+            localStorage.setItem('pera-swarm-channel', channel);
         }
         if (port !== false) {
-            localStorage.setItem(document.location.href.split('?')[0] + '.port', port);
+            localStorage.setItem('pera-swarm-port', port);
         }
         if (key !== false) {
-            localStorage.setItem(document.location.href.split('?')[0] + '.key', key);
+            localStorage.setItem('pera-swarm-key', key);
         }
     }, 2000);
+
     if (username === false && password === false && storedCredentials !== null) {
         return JSON.parse(storedCredentials);
+
     } else if (username !== false && password !== false) {
-        localStorage.setItem(
-            document.location.href.split('?')[0] + '.credentials',
+        localStorage.setItem('pera-swarm-credentials',
             JSON.stringify({
                 username,
                 password
@@ -62,21 +67,12 @@ export function getCredentials() {
     } else {
         return -1;
     }
+
 }
 
 function clearParams() {
-    console.log('clear');
-    // history.replaceState &&
-    //     history.replaceState(
-    //         null,
-    //         '',
-    //         location.pathname + location.search.replace(/[\?&]message=[^&]+/, '').replace(/^&/, '?')
-    //     );
-
-    // TODO: bug in here
-    // window.history.replaceState({}, document.title, '/' + '');
-    // location.pathname + location.search.replace(/[\?&]message=[^&]+/, '').replace(/^&/, '?') + location.hash
-    // location.pathname + location.search.replace(/[\?&]message=[^&]+/, '').replace(/^&/, '?')
+    const path = window.location.origin + window.location.pathname;
+    window.history.pushState({}, document.title, path);
 }
 
 function decodeKey() {

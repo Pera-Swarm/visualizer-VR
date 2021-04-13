@@ -14,17 +14,17 @@ const config = {
     },
     offsets:{
         x: 0,
-        y: 0,
-        z: 0,
+        y: 80,
+        z: 150,
         showZeroMarker: true,
-        showCoordMarker: true,
+        showCoordMarker: false,
         scaleRange: 360
     },
     mqtt: {
-        server: localStorage.getItem(document.location.href.split('?')[0] + '.server') || 'webservices.ceykod.com',
-        port: localStorage.getItem(document.location.href.split('?')[0] + '.port') || 8883,
+        server: localStorage.getItem('pera-swarm-server') || 'webservices.ceykod.com',
+        port: localStorage.getItem('pera-swarm-port') || 8883,
         path: '/mqtt',
-        channel: localStorage.getItem(document.location.href.split('?')[0] + '.channel') || 'v1'
+        channel: localStorage.getItem('pera-swarm-channel') || 'v1'
     },
     mixedReality: {
         obstacles: 'M',

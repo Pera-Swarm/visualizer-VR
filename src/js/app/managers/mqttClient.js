@@ -90,7 +90,7 @@ export default class MQTTClient {
 
                     // Request for obstacle data
                     this.publish(TOPIC_OBSTACLE_REQUEST, Config.mixedReality.obstacles);
-                    
+
                     // Request for coordinate data
                     this.publish(TOPIC_LOC_REQUEST, Config.mixedReality.robots);
 
