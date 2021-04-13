@@ -6,6 +6,7 @@ import TWEEN, { update } from '@tweenjs/tween.js';
 
 // Components
 import Renderer from './components/renderer';
+import Label from './components/label';
 import Camera from './components/camera';
 import Light from './components/light';
 import Controls from './components/controls';
@@ -26,8 +27,10 @@ import DatGUI from './managers/datGUI';
 // Newly implemented classes
 import MQTTClient from './managers/mqttClient';
 
+// Global Variables
+let camera, labelRenderer, INTERSECTED, selectedLabel;
+
 // For click event on robots
-var camera;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -49,6 +52,9 @@ export default class Main {
         window.scene = new THREE.Scene();
         window.scene_scale = Config.scale;
 
+        // High level reality flag
+        window.selectedReality = Config.selectedReality;
+
         // Renderer object
         window.renderer = new Renderer(scene, container).threeRenderer;
 
@@ -62,6 +68,8 @@ export default class Main {
 
         // Create and place lights in scene
         this.light = new Light(scene);
+        this.camera = camera;
+
         const lights = ['ambient', 'directional', 'point', 'hemi'];
         lights.forEach((light) => this.light.place(light));
 
@@ -73,10 +81,21 @@ export default class Main {
 
         this.mqtt = new MQTTClient(scene, markerGroup);
 
-        // Set up rStats if dev environment
+        // Set up Stats if dev environment
         if (Config.isDev && Config.isShowingStats) {
-            this.stats = new Stats(renderer);
-            this.stats.setUp();
+            this.stats = new Stats();
+            // this.container.appendChild(this.stats.dom);
+        }
+
+        if (Config.isShowingLables) {
+            this.labelRenderer = Label();
+            window.labelRenderer = this.labelRenderer; // add to global scope
+            this.container.appendChild(this.labelRenderer.domElement);
+        }
+
+        // Set up gui
+        if (Config.isDev) {
+            this.gui = new DatGUI(this);
         }
 
         THREEAR.initialize({ source: source }).then((controller) => {
@@ -104,8 +123,18 @@ export default class Main {
 
             // -------------------------------------------------------
 
+            if (Config.isDev) {
+                // this.meshHelper = new MeshHelper(this.scene, this.model.obj);
+                //
+                // if (Config.mesh.enableHelper) this.meshHelper.enable();
+
+                this.gui.load(this);
+                this.gui.show();
+            }
+
             var patternMarker = new THREEAR.PatternMarker({
-                patternUrl: './assets/data/hiro.patt',
+                // patternUrl: './assets/data/hiro.patt',
+                patternUrl: './assets/data/pattern-kanji.patt',
                 markerObject: markerGroup
             });
 
@@ -131,16 +160,24 @@ export default class Main {
                 // ----------------------
                 // Render rStats if Dev
                 if (Config.isDev && Config.isShowingStats) {
-                    Stats.start();
+                    // Stats.start();
                 }
 
                 // Call render function and pass in created scene and camera
                 renderer.render(scene, camera);
 
-                // rStats has finished determining render call now
-                if (Config.isDev && Config.isShowingStats) {
-                    Stats.end();
+                // render labels if enabled
+                if (Config.isShowingLables) {
+                    window.labelRenderer.domElement.hidden = false;
+                } else {
+                    window.labelRenderer.domElement.hidden = true;
                 }
+
+                // window.labelRenderer.render(scene, camera.threeCamera);
+
+                if (Config.isDev && Config.isShowingStats) {
+                     // this.stats.update();
+                 }
 
                 // Delta time is sometimes needed for certain updates
                 //const delta = this.clock.getDelta();
@@ -152,6 +189,8 @@ export default class Main {
         });
 
         this.container.querySelector('#loading').style.display = 'none';
+
+        // Eventlistner for catching mouse click events
         window.addEventListener('click', this.onDocumentMouseDown, false);
     }
 
@@ -242,18 +281,75 @@ export default class Main {
     onDocumentMouseDown(event) {
         event.preventDefault();
 
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        // // Not suppported in AR so far
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //
+        // raycaster.setFromCamera(mouse, camera);
+        //
+        // const intersects = raycaster.intersectObjects(scene.children);
+        //
+        // if (intersects.length > 0) {
+        //     const object = intersects[0].object;
+        //     if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
+        //     INTERSECTED = object;
+        //     selectedLabel = INTERSECTED.children[0];
+        //     INTERSECTED.currentOpacity = INTERSECTED.material.opacity;
+        //     INTERSECTED.labelsVisibility = INTERSECTED.material.labelVisibility;
+        //     if (selectedLabel !== undefined && selectedLabel.visible !== undefined && Config.isShowingLables) {
+        //         selectedLabel.visible = !selectedLabel.visible;
+        //     }
+        //     INTERSECTED.material.selected = !INTERSECTED.material.selected;
+        //     // Obstacle selection event handling
+        //     if (INTERSECTED.name.startsWith('Obstacle')) {
+        //         if (INTERSECTED.material.selected) {
+        //             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        //             INTERSECTED.material.emissive.setHex(0xf95f4a);
+        //         } else {
+        //             INTERSECTED.currentHex = INTERSECTED.material.userData.originalEmmisive;
+        //             INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+        //         }
+        //         // Robot selection event handling
+        //     } else if (INTERSECTED.name.startsWith('Robot')) {
+        //         if (INTERSECTED.material.selected) {
+        //             INTERSECTED.material.setValues({ opacity: 0.5 });
+        //         } else {
+        //             INTERSECTED.material.setValues({ opacity: 1 });
+        //         }
+        //         if (INTERSECTED.clickEvent !== undefined) {
+        //             INTERSECTED.clickEvent(INTERSECTED);
+        //         }
+        //     }
+        // } else {
+        //     if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
+        //     INTERSECTED = null;
+        // }
+    }
 
-        raycaster.setFromCamera(mouse, camera);
+    onDocumentMouseMove(event) {
+        event.preventDefault();
 
-        const intersects = raycaster.intersectObjects(scene.children);
-        if (intersects.length > 0) {
-            const obj = intersects[0].object;
-
-            if (obj.clickEvent != undefined) {
-                obj.clickEvent(obj);
-            }
-        }
+        // // Not suppoprted in AR so far
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //
+        // raycaster.setFromCamera(mouse, camera.threeCamera);
+        //
+        // const intersects = raycaster.intersectObjects(scene.children, true);
+        // if (intersects.length > 0) {
+        //     const object = intersects[0].object;
+        //     if (INTERSECTED !== object) {
+        //         if (INTERSECTED) INTERSECTED.material.setValues({ opacity: INTERSECTED.currentOpacity });
+        //         INTERSECTED = object;
+        //         selectedLabel = INTERSECTED.children[0];
+        //         INTERSECTED.currentOpacity = INTERSECTED.material.opacity;
+        //         INTERSECTED.currentColor = INTERSECTED.material.opacity;
+        //         INTERSECTED.material.setValues({ color: 0x03dffc, opacity: 0.75 });
+        //     }
+        // } else {
+        //     if (INTERSECTED)
+        //     INTERSECTED.material.setValues({ opacity: 1.0, color: INTERSECTED.material.userData.originalColor });
+        //     INTERSECTED = null;
+        // }
     }
 }
