@@ -150,7 +150,8 @@ module.exports = (env) => {
                 patterns: [
                     { from: 'node_modules/three/examples/js/libs/stats.min.js' },
                     { from: 'node_modules/three/examples/js/libs/dat.gui.min.js' },
-                    { from: 'src/public/assets/favicon.ico', to: '../favicon.ico' }
+                    { from: 'src/public/assets/favicon.ico', to: '../favicon.ico' },
+                    { from: 'src/public/instructions.html', to: '../instructions/index.html' }
                 ]
             })
         ),

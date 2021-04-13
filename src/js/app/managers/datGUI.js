@@ -23,31 +23,30 @@ export default class DatGUI {
         const offsetRange = parseInt(Config.offsets.scaleRange);
 
         // ---------------------------------------------------------------------
-        // Add folders
-        this.gui
-        .add(Config, 'isShowingRobotSnapshots')
-        .name('Robot Snapshots')
-        .onChange((value) => {
-            Config.isShowingRobotSnapshots = value;
-            saveConfig(Config);
-        });
-
-        /* Labels Folder */
-        const labelsFolder = this.gui.addFolder('Labels');
-        labelsFolder
-        .add(Config, 'isShowingLables')
-        .name('All Labels')
-        .onChange((value) => {
-            Config.isShowingLables = value;
-            Config.labelsVisibility = {
-                obstacles: value,
-                robots: value
-            };
-            saveConfig(Config);
-        });
+        // Robot Snapshots
+        // this.gui
+        // .add(Config, 'isShowingRobotSnapshots')
+        // .name('Robot Snapshots')
+        // .onChange((value) => {
+        //     Config.isShowingRobotSnapshots = value;
+        //     saveConfig(Config);
+        // });
 
         // ---------------------------------------------------------------------
         // labelsFolder
+
+        // const labelsFolder = this.gui.addFolder('Labels');
+        // labelsFolder
+        // .add(Config, 'isShowingLables')
+        // .name('All Labels')
+        // .onChange((value) => {
+        //     Config.isShowingLables = value;
+        //     Config.labelsVisibility = {
+        //         obstacles: value,
+        //         robots: value
+        //     };
+        //     saveConfig(Config);
+        // });
         // .add(Config.labelsVisibility, 'obstacles')
         // .name('Obstacle Labels')
         // .onChange((value) => {
