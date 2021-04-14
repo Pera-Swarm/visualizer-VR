@@ -49,9 +49,9 @@ export function getCredentials() {
 
     if (username === false && password === false && storedCredentials !== null) {
         return JSON.parse(storedCredentials);
-
     } else if (username !== false && password !== false) {
-        localStorage.setItem('pera-swarm-credentials',
+        localStorage.setItem(
+            'pera-swarm-credentials',
             JSON.stringify({
                 username,
                 password
@@ -67,7 +67,6 @@ export function getCredentials() {
     } else {
         return -1;
     }
-
 }
 
 function clearParams() {

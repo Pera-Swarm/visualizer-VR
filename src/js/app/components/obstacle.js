@@ -3,7 +3,7 @@ import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
 import { addLabel, removeLabel } from './label';
-import {transformPosition, transformScale, transformRotation} from '../helpers/coordinateTransform';
+import { transformPosition, transformScale, transformRotation } from '../helpers/coordinateTransform';
 
 const OBSTACLE_PREFIX = 'Obstacle_';
 
@@ -67,8 +67,8 @@ export default class Obstacle {
             const { x, y } = obstacle.position;
             const z = this.calculateZ(obstacle);
 
-            const {posX, posY, posZ } = transformPosition(x,y,z, this.scale);
-            const {scaleX, scaleY, scaleZ } = transformScale(this.scale);
+            const { posX, posY, posZ } = transformPosition(x, y, z, this.scale);
+            const { scaleX, scaleY, scaleZ } = transformScale(this.scale);
 
             mesh.position.set(posX, posY, posZ);
             mesh.scale.set(scaleX, scaleY, scaleZ);
@@ -81,8 +81,8 @@ export default class Obstacle {
             const radY = (y / 360) * 2 * Math.PI;
             const radZ = (z / 360) * 2 * Math.PI;
 
-            const {rotX, rotY, rotZ } = transformRotation(radX, radY, radZ);
-            mesh.rotation.set(rotX, rotY,rotZ);
+            const { rotX, rotY, rotZ } = transformRotation(radX, radY, radZ);
+            mesh.rotation.set(rotX, rotY, rotZ);
         }
 
         // Show shadows of the object if enabled
@@ -99,15 +99,12 @@ export default class Obstacle {
 
         if (g.type == 'BoxGeometry') {
             return this.createBoxGeometry(g.width, g.height, g.depth);
-
         } else if (g.type == 'CylinderGeometry') {
             return this.createCylinderGeometry(g.radiusTop, g.radiusBottom, g.height);
-
         } else if (g.type == 'SphereGeometry') {
             return this.createSphereGeometry(g.radius);
         }
         throw new TypeError('unsupported geometry type');
-
     }
 
     createBoxGeometry(width, height, depth) {
@@ -159,7 +156,6 @@ export default class Obstacle {
         }
         // Default material type
         return new THREE.MeshStandardMaterial(m.properties);
-
     }
 
     calculateZ(obstacle) {
@@ -173,7 +169,6 @@ export default class Obstacle {
                 return obstacle.geometry.radius;
             }
             return 0;
-
         }
         return obstacle.position.z;
     }

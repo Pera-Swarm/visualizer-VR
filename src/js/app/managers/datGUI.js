@@ -1,5 +1,5 @@
 import Config, { saveConfig } from '../../data/config';
-import {transformPosition, transformScale, transformRotation} from '../helpers/coordinateTransform';
+import { transformPosition, transformScale, transformRotation } from '../helpers/coordinateTransform';
 
 // COMMENT(NuwanJ)
 // Store the last state of the toggles in the window.localStorage
@@ -19,7 +19,6 @@ export default class DatGUI {
     }
 
     load(main, mesh) {
-
         const offsetRange = parseInt(Config.offsets.scaleRange);
 
         // ---------------------------------------------------------------------
@@ -68,91 +67,91 @@ export default class DatGUI {
         const realityFolder = this.gui.addFolder('Reality');
 
         realityFolder
-        .add(Config.selectedRealities, 'real')
-        .name('Physical Reality')
-        .listen()
-        .onChange((value) => {
-            this.toggleReality('real', 'R');
-            saveConfig(Config);
-        });
+            .add(Config.selectedRealities, 'real')
+            .name('Physical Reality')
+            .listen()
+            .onChange((value) => {
+                this.toggleReality('real', 'R');
+                saveConfig(Config);
+            });
         realityFolder
-        .add(Config.selectedRealities, 'virtual')
-        .name('Virtual Reality')
-        .listen()
-        .onChange((value) => {
-            this.toggleReality('virtual', 'V');
-            saveConfig(Config);
-        });
+            .add(Config.selectedRealities, 'virtual')
+            .name('Virtual Reality')
+            .listen()
+            .onChange((value) => {
+                this.toggleReality('virtual', 'V');
+                saveConfig(Config);
+            });
 
         // ---------------------------------------------------------------------
         const placeFolder = this.gui.addFolder('Placement');
 
         // Toggle visibility of Zero marker (yellow)
         placeFolder
-        .add(Config.offsets, 'showZeroMarker')
-        .name('Zero Marker')
-        .listen()
-        .onChange((value) => {
-            saveConfig(Config);
-            window.zeroMarker.visible = value;
-        });
+            .add(Config.offsets, 'showZeroMarker')
+            .name('Zero Marker')
+            .listen()
+            .onChange((value) => {
+                saveConfig(Config);
+                window.zeroMarker.visible = value;
+            });
 
         // Toggle visibility of Coord marker (red)
         placeFolder
-        .add(Config.offsets, 'showCoordMarker')
-        .name('Coordinate Marker')
-        .listen()
-        .onChange((value) => {
-            saveConfig(Config);
-            window.coordMarker.visible = value;
-        });
+            .add(Config.offsets, 'showCoordMarker')
+            .name('Coordinate Marker')
+            .listen()
+            .onChange((value) => {
+                saveConfig(Config);
+                window.coordMarker.visible = value;
+            });
         // ---------------------------------------------------------------------
         // X Offset
         placeFolder
-        .add(Config.offsets, 'x')
-        .min(-1*parseInt(360))
-        .max(parseInt(360))
-        .name('X Offset')
-        .listen()
-        .onChange((value)=>{
-            Config.offsets.x = value
-            this.updateCoord();
-            saveConfig(Config);
-        });
+            .add(Config.offsets, 'x')
+            .min(-1 * parseInt(360))
+            .max(parseInt(360))
+            .name('X Offset')
+            .listen()
+            .onChange((value) => {
+                Config.offsets.x = value;
+                this.updateCoord();
+                saveConfig(Config);
+            });
         // Y Offset
         placeFolder
-        .add(Config.offsets, 'y')
-        .min(-1*parseInt(360))
-        .max(parseInt(360))
-        .name('Y Offset')
-        .listen()
-        .onChange((value)=>{
-            Config.offsets.y = value
-            this.updateCoord();
-            saveConfig(Config);
-        });
+            .add(Config.offsets, 'y')
+            .min(-1 * parseInt(360))
+            .max(parseInt(360))
+            .name('Y Offset')
+            .listen()
+            .onChange((value) => {
+                Config.offsets.y = value;
+                this.updateCoord();
+                saveConfig(Config);
+            });
         // Z Offset
         placeFolder
-        .add(Config.offsets, 'z')
-        .min(-1*parseInt(360))
-        .max(parseInt(360))
-        .name('Z Offset')
-        .listen()
-        .onChange((value)=>{
-            Config.offsets.z = value
-            this.updateCoord();
-            saveConfig(Config);
-        });
+            .add(Config.offsets, 'z')
+            .min(-1 * parseInt(360))
+            .max(parseInt(360))
+            .name('Z Offset')
+            .listen()
+            .onChange((value) => {
+                Config.offsets.z = value;
+                this.updateCoord();
+                saveConfig(Config);
+            });
         // Scale Offset
         placeFolder
-        .add(Config, 'scale', 0, 0.05)
-        .name('Scale')
-        .listen()
-        .onChange((value)=>{
-            Config.offsets.scale = value
-            window.coordMarker.scale.set(value,value,value);
-            saveConfig(Config);
-        });
+            .add(Config, 'scale', 0, 0.05)
+            .name('Scale')
+            .listen()
+            .onChange((value) => {
+                Config.offsets.scale = value;
+                window.coordMarker.scale.set(value, value, value);
+                saveConfig(Config);
+            });
 
         /* Global */
         this.gui.open();
@@ -193,10 +192,9 @@ export default class DatGUI {
         });
     }
 
-
-    updateCoord(){
+    updateCoord() {
         const pos = window.coordMarker.position;
-        const {posX, posY, posZ } = transformPosition(pos.x,pos.y,pos.z, scene_scale);
+        const { posX, posY, posZ } = transformPosition(pos.x, pos.y, pos.z, scene_scale);
         window.coordMarker.position.set(posX, posY, posZ);
     }
 

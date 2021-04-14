@@ -3,7 +3,7 @@ import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
 import { addLabel, removeLabel } from './label';
-import {transformPosition, transformScale, transformRotation} from '../helpers/coordinateTransform';
+import { transformPosition, transformScale, transformRotation } from '../helpers/coordinateTransform';
 
 var STLLoader = require('three-stl-loader')(THREE);
 
@@ -27,7 +27,7 @@ export default class Robot {
         return r;
     }
 
-    create(id, x, y, heading, reality = 'V',callback) {
+    create(id, x, y, heading, reality = 'V', callback) {
         var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
         const REALITY = Config.mixedReality.robots;
 
@@ -35,7 +35,6 @@ export default class Robot {
             // Create only if not exists
 
             if (reality === REALITY || REALITY === 'M') {
-
                 // Limit the arena that robot can go
                 x = Math.min(Math.max(x, Config.arena.minX), Config.arena.maxX);
                 y = Math.min(Math.max(y, Config.arena.minY), Config.arena.maxY);
@@ -43,130 +42,131 @@ export default class Robot {
 
                 var loader = new STLLoader();
                 loader.load('./assets/models/model.stl', function (geometry, scene) {
-                    const material = new THREE.MeshStandardMaterial(
-                        { color: 0x666666,opacity: opacity,transparent: true });
-                        material.userData.originalColor = new THREE.Color(0x666666);
-                        material.userData.labelVisibility = Config.isShowingLables && Config.labelsVisibility.robots;
-                        material.selected = false;
-
-                        const scale = window.scene_scale || 0.1;
-
-                        const {posX, posY, posZ } = transformPosition(x,y, 0, scale);
-                        const {rotX, rotY, rotZ } = transformRotation(0,0,0);
-                        const {scaleX, scaleY, scaleZ } = transformScale(scale);
-
-                        // console.log('scale', scale);
-                        var r = new THREE.Mesh(geometry, material);
-                        r.receiveShadow = true;
-                        r.robotId = id;
-                        r.name = ROBOT_PREFIX + id;
-                        r.scale.set(scaleX, scaleY, scaleZ);
-                        r.position.set(posX, posY, posZ);
-                        r.rotation.set(rotX, rotY, rotZ ); //.y = (heading - 90) * THREE.Math.DEG2RAD;
-                        r.reality = reality; // set reality flag
-
-                        if (reality === 'V') {
-                            // material.visible = Config.selectedRealities.virtual;
-                            material.opacity = Config.selectedRealities.virtual ? 1.0 : Config.hiddenOpacity;
-                        } else if (reality === 'R') {
-                            // material.visible = Config.selectedRealities.real;
-                            material.opacity = Config.selectedRealities.real ? 1.0 : Config.hiddenOpacity;
-                        }
-
-                        window.markerGroup.add(r);
-
-                        r.clickEvent = function (m) {
-                            window.robot.alert(m);
-                        };
-
-                        // Add labels to every robot, immediately displayed if enabled
-                        addLabel(ROBOT_PREFIX, { id, name: r.name }, r, Config.labelsVisibility.robots);
-
-                        console.log(`Created> Robot: id:${id} | x:${x} y: ${y} heading: ${heading} | reality: ${reality}`);
-
-                        // Callback function
-                        if (callback !== undefined) callback('success');
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0x666666,
+                        opacity: opacity,
+                        transparent: true
                     });
-                } else {
-                    console.error(`Creation Failed> Robot: id:${id}  reality: ${reality}!=${REALITY}`);
-                }
+                    material.userData.originalColor = new THREE.Color(0x666666);
+                    material.userData.labelVisibility = Config.isShowingLables && Config.labelsVisibility.robots;
+                    material.selected = false;
 
-            }else if (reality === REALITY || REALITY === 'M') {
-                // Reality matches
+                    const scale = window.scene_scale || 0.1;
 
-                this.setReality(id, reality);
-                // Callback function
-                if (callback !== undefined) callback('success');
+                    const { posX, posY, posZ } = transformPosition(x, y, 0, scale);
+                    const { rotX, rotY, rotZ } = transformRotation(0, 0, 0);
+                    const { scaleX, scaleY, scaleZ } = transformScale(scale);
 
-            }else{
-                // Robot reality not matching with environment reality
-                this.delete(id);
-                // Callback function
-                if (callback !== undefined) callback('deleted');
-            }
-            return r;
-        }
+                    // console.log('scale', scale);
+                    var r = new THREE.Mesh(geometry, material);
+                    r.receiveShadow = true;
+                    r.robotId = id;
+                    r.name = ROBOT_PREFIX + id;
+                    r.scale.set(scaleX, scaleY, scaleZ);
+                    r.position.set(posX, posY, posZ);
+                    r.rotation.set(rotX, rotY, rotZ); //.y = (heading - 90) * THREE.Math.DEG2RAD;
+                    r.reality = reality; // set reality flag
 
-        delete(id, callback) {
-            if (id !== undefined) {
-                var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
+                    if (reality === 'V') {
+                        // material.visible = Config.selectedRealities.virtual;
+                        material.opacity = Config.selectedRealities.virtual ? 1.0 : Config.hiddenOpacity;
+                    } else if (reality === 'R') {
+                        // material.visible = Config.selectedRealities.real;
+                        material.opacity = Config.selectedRealities.real ? 1.0 : Config.hiddenOpacity;
+                    }
 
-                if (r !== undefined) {
-                    scene.remove(r);
-                    console.log('Deleted> id:', id);
-                    removeLabel(obj[1]);
+                    window.markerGroup.add(r);
+
+                    r.clickEvent = function (m) {
+                        window.robot.alert(m);
+                    };
+
+                    // Add labels to every robot, immediately displayed if enabled
+                    addLabel(ROBOT_PREFIX, { id, name: r.name }, r, Config.labelsVisibility.robots);
+
+                    console.log(`Created> Robot: id:${id} | x:${x} y: ${y} heading: ${heading} | reality: ${reality}`);
+
+                    // Callback function
                     if (callback !== undefined) callback('success');
-                } else if (callback !== undefined) callback('not found');
-            } else if (callback !== undefined) callback('id not specified');
+                });
+            } else {
+                console.error(`Creation Failed> Robot: id:${id}  reality: ${reality}!=${REALITY}`);
+            }
+        } else if (reality === REALITY || REALITY === 'M') {
+            // Reality matches
+
+            this.setReality(id, reality);
+            // Callback function
+            if (callback !== undefined) callback('success');
+        } else {
+            // Robot reality not matching with environment reality
+            this.delete(id);
+            // Callback function
+            if (callback !== undefined) callback('deleted');
         }
+        return r;
+    }
 
-        deleteAll() {
-            // Delete all robots
-            const objects = window.markerGroup.children;
-
-            Object.entries(objects).forEach((obj) => {
-                const name = obj[1]['name'];
-
-                if (name.startsWith(ROBOT_PREFIX)) {
-                    console.log('Deleted>', name);
-                    removeLabel(obj[1]);
-                    window.markerGroup.remove(obj[1]);
-                }
-            });
-        }
-
-        exists(id) {
+    delete(id, callback) {
+        if (id !== undefined) {
             var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
-            return r;
-        }
 
-        move(id, x, y, heading, callback) {
-            var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
             if (r !== undefined) {
-                const currentHeading = r.rotation.y;
-                const newHeading = (heading - 90) * THREE.Math.DEG2RAD;
-                var position = { x: r.position.x, y: r.position.z, heading: r.rotation.y };
+                scene.remove(r);
+                console.log('Deleted> id:', id);
+                removeLabel(obj[1]);
+                if (callback !== undefined) callback('success');
+            } else if (callback !== undefined) callback('not found');
+        } else if (callback !== undefined) callback('id not specified');
+    }
 
-                // TODO: need a smoother way than this rough trick
-                // If current and target rotations in different signs
-                const rotationFlag = currentHeading * newHeading >= 0 ? true : false;
+    deleteAll() {
+        // Delete all robots
+        const objects = window.markerGroup.children;
 
-                // Limit the arena that robot can go
-                x = Math.min(Math.max(Math.round(x * 10) / 10, Config.arena.minX), Config.arena.maxX);
-                y = Math.min(Math.max(Math.round(y * 10) / 10, Config.arena.minY), Config.arena.maxY);
-                heading = Math.round(heading * 10) / 10;
+        Object.entries(objects).forEach((obj) => {
+            const name = obj[1]['name'];
 
-                const {posX, posY, posZ } = transformPosition(x,y, 0, scale);
-                const {rotX, rotY, rotZ } = transformRotation(0,0,0);
+            if (name.startsWith(ROBOT_PREFIX)) {
+                console.log('Deleted>', name);
+                removeLabel(obj[1]);
+                window.markerGroup.remove(obj[1]);
+            }
+        });
+    }
 
-                // const speed = 10;
-                const distance = Math.sqrt(Math.pow(posX - position.x, 2) + Math.pow(posY - position.y, 2));
+    exists(id) {
+        var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
+        return r;
+    }
 
-                const moveTime = 1; //distance / speed;
-                // TODO: If distance is 0, need to handle only the rotation
+    move(id, x, y, heading, callback) {
+        var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
+        if (r !== undefined) {
+            const currentHeading = r.rotation.y;
+            const newHeading = (heading - 90) * THREE.Math.DEG2RAD;
+            var position = { x: r.position.x, y: r.position.z, heading: r.rotation.y };
 
-                if (distance !== 0) {
-                    var tween = new TWEEN.Tween(position)
+            // TODO: need a smoother way than this rough trick
+            // If current and target rotations in different signs
+            const rotationFlag = currentHeading * newHeading >= 0 ? true : false;
+
+            // Limit the arena that robot can go
+            x = Math.min(Math.max(Math.round(x * 10) / 10, Config.arena.minX), Config.arena.maxX);
+            y = Math.min(Math.max(Math.round(y * 10) / 10, Config.arena.minY), Config.arena.maxY);
+            heading = Math.round(heading * 10) / 10;
+
+            const { posX, posY, posZ } = transformPosition(x, y, 0, scale);
+            const { rotX, rotY, rotZ } = transformRotation(0, 0, 0);
+
+            // const speed = 10;
+            const distance = Math.sqrt(Math.pow(posX - position.x, 2) + Math.pow(posY - position.y, 2));
+
+            const moveTime = 1; //distance / speed;
+            // TODO: If distance is 0, need to handle only the rotation
+
+            if (distance !== 0) {
+                var tween = new TWEEN.Tween(position)
                     .to({ x: posX, y: posY, heading: newHeading }, 1000 * moveTime)
                     /*.easing(TWEEN.Easing.Quartic.InOut)*/
                     .onUpdate(function () {
@@ -186,59 +186,59 @@ export default class Robot {
                     })
                     .delay(50)
                     .start();
-                } else {
-                    // No move, only the rotation
-                    r.rotation.y = newHeading;
-                }
-                return r;
             } else {
-                if (callback != null) callback('undefined');
+                // No move, only the rotation
+                r.rotation.y = newHeading;
             }
-        }
-
-        get_coordinates(id) {
-            var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
-            if (r !== undefined) {
-                console.log(`${r.position.x},${r.position.y},${r.position.z}`);
-                return r;
-            }
-            return null;
-        }
-
-        update() {
-            TWEEN.update();
-        }
-
-        requestSnapshot(mesh) {
-            return new Promise((resolve, reject) => {
-                // TODO: Review this
-                const req = window.mqtt.publish(
-                    window.channel + '/mgt/robots/snapshot',
-                    JSON.stringify({ id: mesh.robotId })
-                );
-                resolve(!req);
-            });
-        }
-
-        alert(mesh) {
-            // Display an alert on window
-            const disp = document.querySelector('#msg-box');
-            const prevContent = document.getElementById('msg-content');
-            let content = document.createElement('div');
-            content.setAttribute('id', 'msg-content');
-            let nodeContent;
-            if (Config.isShowingRobotSnapshots) {
-                nodeContent = document.createTextNode(`${mesh.name} Snapshot Loading...`);
-                this.requestSnapshot(mesh);
-            } else {
-                nodeContent = document.createTextNode(`${mesh.name}`);
-            }
-            content.appendChild(nodeContent);
-            disp.replaceChild(content, prevContent);
-            disp.style.display = 'block';
-            setTimeout(function () {
-                disp.style.opacity = '1.0';
-                disp.style.display = 'none';
-            }, 10000);
+            return r;
+        } else {
+            if (callback != null) callback('undefined');
         }
     }
+
+    get_coordinates(id) {
+        var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
+        if (r !== undefined) {
+            console.log(`${r.position.x},${r.position.y},${r.position.z}`);
+            return r;
+        }
+        return null;
+    }
+
+    update() {
+        TWEEN.update();
+    }
+
+    requestSnapshot(mesh) {
+        return new Promise((resolve, reject) => {
+            // TODO: Review this
+            const req = window.mqtt.publish(
+                window.channel + '/mgt/robots/snapshot',
+                JSON.stringify({ id: mesh.robotId })
+            );
+            resolve(!req);
+        });
+    }
+
+    alert(mesh) {
+        // Display an alert on window
+        const disp = document.querySelector('#msg-box');
+        const prevContent = document.getElementById('msg-content');
+        let content = document.createElement('div');
+        content.setAttribute('id', 'msg-content');
+        let nodeContent;
+        if (Config.isShowingRobotSnapshots) {
+            nodeContent = document.createTextNode(`${mesh.name} Snapshot Loading...`);
+            this.requestSnapshot(mesh);
+        } else {
+            nodeContent = document.createTextNode(`${mesh.name}`);
+        }
+        content.appendChild(nodeContent);
+        disp.replaceChild(content, prevContent);
+        disp.style.display = 'block';
+        setTimeout(function () {
+            disp.style.opacity = '1.0';
+            disp.style.display = 'none';
+        }, 10000);
+    }
+}

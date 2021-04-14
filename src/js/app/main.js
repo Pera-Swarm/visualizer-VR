@@ -176,8 +176,8 @@ export default class Main {
                 // window.labelRenderer.render(scene, camera.threeCamera);
 
                 if (Config.isDev && Config.isShowingStats) {
-                     // this.stats.update();
-                 }
+                    // this.stats.update();
+                }
 
                 // Delta time is sometimes needed for certain updates
                 //const delta = this.clock.getDelta();

@@ -181,7 +181,6 @@ export default class MQTTClient {
             } catch (e) {
                 console.error(e);
             }
-
         } else if (topic == TOPIC_OBSTACLES_LIST) {
             // Create obstacles in the arena
             try {
@@ -190,17 +189,14 @@ export default class MQTTClient {
             } catch (e) {
                 console.error(e);
             }
-
         } else if (topic == TOPIC_OBSTACLES_DELETE) {
             // Delete obstacle given in the id
             const data = JSON.parse(msg);
             console.log(data);
             window.obstacles.deleteIfExists(data.id);
-
         } else if (topic == TOPIC_OBSTACLES_DELETE_ALL) {
             // Delete all obstacles
             window.obstacles.deleteAll();
-
         } else if (topic == TOPIC_CHANGE_COLOR) {
             try {
                 const data = JSON.parse(msg);
@@ -208,7 +204,6 @@ export default class MQTTClient {
             } catch (e) {
                 console.error(e);
             }
-
         } else if (topic == TOPIC_ROBOT_BROADCAST) {
             // Display a popup message
             // TODO: Do this by a generalized function call
@@ -245,7 +240,6 @@ export default class MQTTClient {
             } else {
                 console.log('>Management:', msg);
             }
-
         } else if (msg.startsWith('MSG')) {
             const m = 'Notice: ' + msg.substring(4);
             const t = 2000 + m.length * 95;
@@ -261,7 +255,6 @@ export default class MQTTClient {
             }, t);
         } else {
         }
-
     }
 
     subscribe(topic, callback) {

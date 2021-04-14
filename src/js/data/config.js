@@ -12,7 +12,7 @@ const config = {
         minY: -85,
         maxY: 85
     },
-    offsets:{
+    offsets: {
         x: 0,
         y: 80,
         z: 150,
