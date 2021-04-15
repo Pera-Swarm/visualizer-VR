@@ -22,8 +22,8 @@ const config = {
     },
     mqtt: {
         server: localStorage.getItem('pera-swarm-server') || 'webservices.ceykod.com',
-        port: localStorage.getItem('pera-swarm-port') || 8883,
-        path: '/mqtt',
+        port: parseInt(localStorage.getItem('pera-swarm-port')) || 8883,
+        path: localStorage.getItem('pera-swarm-path') || '/mqtt',
         channel: localStorage.getItem('pera-swarm-channel') || 'v1'
     },
     mixedReality: {
