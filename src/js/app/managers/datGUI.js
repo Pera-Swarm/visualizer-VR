@@ -133,8 +133,8 @@ export default class DatGUI {
         // Z Offset
         placeFolder
             .add(Config.offsets, 'z')
-            .min(-1 * parseInt(360))
-            .max(parseInt(360))
+            .min(-1 * parseInt(500))
+            .max(parseInt(500))
             .name('Z Offset')
             .listen()
             .onChange((value) => {
@@ -144,7 +144,7 @@ export default class DatGUI {
             });
         // Scale Offset
         placeFolder
-            .add(Config, 'scale', 0, 0.05)
+            .add(Config, 'scale', 0, 0.1)
             .name('Scale')
             .listen()
             .onChange((value) => {

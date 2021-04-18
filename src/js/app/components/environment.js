@@ -11,7 +11,8 @@ export default class Environment {
         // var material = new THREE.MeshPhongMaterial({
         var material = new THREE.MeshStandardMaterial({
             color: 0x999999,
-            depthWrite: false
+            depthWrite: false,
+            opacity: 0
         });
 
         const { posX, posY, posZ } = transformPosition(0, 0, 0, scene_scale);
@@ -19,21 +20,21 @@ export default class Environment {
         const { scaleX, scaleY, scaleZ } = transformScale(scene_scale);
 
         // Ground
-        var ground = new THREE.Mesh(geometry, material);
-        ground.rotation.set(rotX - Math.PI / 2, rotY, rotZ);
-        ground.position.set(posX, posY, posZ);
-        ground.scale.set(scaleX, scaleY, scaleZ);
-        ground.material.opacity = 0.35;
-        ground.receiveShadow = true;
-        markerGroup.add(ground);
+        // var ground = new THREE.Mesh(geometry, material);
+        // ground.rotation.set(rotX - Math.PI / 2, rotY, rotZ);
+        // ground.position.set(posX, posY, posZ);
+        // ground.scale.set(scaleX, scaleY, scaleZ);
+        // // ground.material.opacity = 0.05;
+        // ground.receiveShadow = true;
+        // markerGroup.add(ground);
 
         // Grid
         var grid = new THREE.GridHelper(Config.arena.size, 18, 0x000000, 0x5b5b5b);
         grid.rotation.set(rotX, rotY, rotZ);
         grid.position.set(posX, posY, posZ);
         grid.scale.set(scaleX, scaleY, scaleZ);
-        grid.material.opacity = 0.35;
-        grid.material.transparent = true;
+        grid.material.opacity = 0.15;
+        // grid.material.transparent = true;
         markerGroup.add(grid);
 
         // Zero marker

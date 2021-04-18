@@ -12,8 +12,19 @@ const ROBOT_PREFIX = 'Robot_';
 export default class Robot {
     constructor(scene) {
         this.scene = scene;
-        this.scale = scene_scale;
+        this.scale = Config.scale;
         console.log('Robot Reality:', Config.mixedReality.robots);
+
+        // This will check for duplicated instances of robots and delete them
+        const that = this;
+        this.created = true;
+        setInterval(() => {
+            if (this.created === true) {
+                // console.log('call prune');
+                that.prune();
+                this.created = false;
+            }
+        }, 2500);
     }
 
     changeColor(id, R, G, B, callback) {
@@ -51,7 +62,7 @@ export default class Robot {
                     material.userData.labelVisibility = Config.isShowingLables && Config.labelsVisibility.robots;
                     material.selected = false;
 
-                    const scale = window.scene_scale || 0.1;
+                    const scale = Config.scale || 0.1;
 
                     const { posX, posY, posZ } = transformPosition(x, y, 0, scale);
                     const { rotX, rotY, rotZ } = transformRotation(0, 0, 0);
@@ -104,6 +115,8 @@ export default class Robot {
             // Callback function
             if (callback !== undefined) callback('deleted');
         }
+
+        this.created = true; // asked to prune in next cycle
         return r;
     }
 
@@ -135,6 +148,13 @@ export default class Robot {
         });
     }
 
+    setReality(id, reality) {
+        var r = this.scene.getObjectByName(ROBOT_PREFIX + id);
+        if (r != undefined) {
+            r.reality = reality;
+        }
+    }
+
     exists(id) {
         var r = window.markerGroup.getObjectByName(ROBOT_PREFIX + id);
         return r;
@@ -145,7 +165,7 @@ export default class Robot {
         if (r !== undefined) {
             const currentHeading = r.rotation.y;
             const newHeading = (heading - 90) * THREE.Math.DEG2RAD;
-            var position = { x: r.position.x, y: r.position.z, heading: r.rotation.y };
+            var position = { x: r.position.x, y: r.position.y, heading: r.rotation.y };
 
             // TODO: need a smoother way than this rough trick
             // If current and target rotations in different signs
@@ -156,7 +176,7 @@ export default class Robot {
             y = Math.min(Math.max(Math.round(y * 10) / 10, Config.arena.minY), Config.arena.maxY);
             heading = Math.round(heading * 10) / 10;
 
-            const { posX, posY, posZ } = transformPosition(x, y, 0, scale);
+            const { posX, posY, posZ } = transformPosition(x, y, 0, Config.scale);
             const { rotX, rotY, rotZ } = transformRotation(0, 0, 0);
 
             // const speed = 10;
@@ -167,25 +187,25 @@ export default class Robot {
 
             if (distance !== 0) {
                 var tween = new TWEEN.Tween(position)
-                    .to({ x: posX, y: posY, heading: newHeading }, 1000 * moveTime)
-                    /*.easing(TWEEN.Easing.Quartic.InOut)*/
-                    .onUpdate(function () {
-                        r.position.x = position.x;
-                        r.position.y = position.y;
+                .to({ x: posX, y: posY, heading: newHeading }, 1000 * moveTime)
+                /*.easing(TWEEN.Easing.Quartic.InOut)*/
+                .onUpdate(function () {
+                    r.position.x = position.x;
+                    r.position.y = position.y;
 
-                        if (rotationFlag) {
-                            r.rotation.y = position.heading;
-                        } else {
-                            //console.log(currentHeading, newHeading);
-                        }
-                    })
-                    .onComplete(() => {
-                        //console.log('Moved> id:',id,'x:',x,'y:',y,'heading:',heading);
+                    if (rotationFlag) {
                         r.rotation.y = position.heading;
-                        if (callback != null) callback('success');
-                    })
-                    .delay(50)
-                    .start();
+                    } else {
+                        //console.log(currentHeading, newHeading);
+                    }
+                })
+                .onComplete(() => {
+                    //console.log('Moved> id:',id,'x:',x,'y:',y,'heading:',heading);
+                    r.rotation.y = position.heading;
+                    if (callback != null) callback('success');
+                })
+                .delay(50)
+                .start();
             } else {
                 // No move, only the rotation
                 r.rotation.y = newHeading;
@@ -240,5 +260,29 @@ export default class Robot {
             disp.style.opacity = '1.0';
             disp.style.display = 'none';
         }, 10000);
+    }
+
+
+    prune() {
+        // Delete all duplicate robots
+        const objects = window.markerGroup.children;
+        let valid = [];
+        Object.entries(objects).forEach((obj) => {
+            const name = obj[1]['name'];
+            // console.log('checking: ', name);
+
+            if (name.startsWith(ROBOT_PREFIX)) {
+                if (valid[name] === undefined) {
+                    // mark as valid
+                    valid[name] = 'valid';
+                } else {
+                    // this is a duplicate
+                    // console.log(obj[1]);
+                    removeLabel(obj[1]);
+                    this.scene.remove(obj[1]);
+                    console.log(name, ': duplicate');
+                }
+            }
+        });
     }
 }
