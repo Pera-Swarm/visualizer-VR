@@ -12,7 +12,7 @@ const config = {
         minY: -85,
         maxY: 85
     },
-    offsets:{
+    offsets: {
         x: 0,
         y: 80,
         z: 150,
@@ -22,8 +22,8 @@ const config = {
     },
     mqtt: {
         server: localStorage.getItem('pera-swarm-server') || 'webservices.ceykod.com',
-        port: localStorage.getItem('pera-swarm-port') || 8883,
-        path: '/mqtt',
+        port: parseInt(localStorage.getItem('pera-swarm-port')) || 8883,
+        path: localStorage.getItem('pera-swarm-path') || '/mqtt',
         channel: localStorage.getItem('pera-swarm-channel') || 'v1'
     },
     mixedReality: {
@@ -145,12 +145,12 @@ const config = {
 };
 
 // Check localstorage for updated config, if not use above config
-const storedConfig = localStorage.getItem(document.location.href + '.config');
+const storedConfig = localStorage.getItem(document.location.href + '-vr.config');
 resolvedConfig = storedConfig !== null && storedConfig !== undefined ? JSON.parse(storedConfig) : config;
 
 // method to presist config data with localStorage
 export const saveConfig = (data) => {
-    localStorage.setItem(document.location.href + '.config', JSON.stringify({ ...config, ...data }));
+    localStorage.setItem(document.location.href + '-vr.config', JSON.stringify({ ...config, ...data }));
 };
 
 export default resolvedConfig;

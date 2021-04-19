@@ -18,10 +18,8 @@ import Config from './../data/config';
 
 // Helpers
 import Stats from './helpers/stats';
-//import MeshHelper from './helpers/meshHelper';
 
 // Managers
-import Interaction from './managers/interaction';
 import DatGUI from './managers/datGUI';
 
 // Newly implemented classes
@@ -31,8 +29,8 @@ import MQTTClient from './managers/mqttClient';
 let camera, labelRenderer, INTERSECTED, selectedLabel;
 
 // For click event on robots
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
+// const raycaster = new THREE.Raycaster();
+// const mouse = new THREE.Vector2();
 
 // This class instantiates and ties all of the components together, starts the loading process and renders the main loop
 export default class Main {
@@ -57,9 +55,6 @@ export default class Main {
 
         // Renderer object
         window.renderer = new Renderer(scene, container).threeRenderer;
-
-        // Apply fog
-        //scene.fog = new THREE.FogExp2(Config.fog.color, Config.fog.near);
 
         // init scene and camera
         camera = new THREE.Camera();
@@ -99,37 +94,14 @@ export default class Main {
         }
 
         THREEAR.initialize({ source: source }).then((controller) => {
-            // add a torus knot
-            // var geometry = new THREE.TorusKnotGeometry(0.3,0.1,64,16);
-            // var material = new THREE.MeshNormalMaterial();
-            // var torus = new THREE.Mesh( geometry, material );
-            // torus.position.y = 0.5
-            // markerGroup.add(torus);
-            //
-            // var geometry = new THREE.CubeGeometry(1,1,1);
-            // var material = new THREE.MeshNormalMaterial({
-            //     transparent : true,
-            //     opacity: 0.5,
-            //     side: THREE.DoubleSide
-            // });
-            // var cube = new THREE.Mesh( geometry, material );
-            // cube.position.y	= geometry.parameters.height / 2;
-            // markerGroup.add(cube)
-
-            // -------------------------------------------------------
+            //  -------------------------------------------------------
             // Create the environment
-
             this.environment = new Environment();
 
             // -------------------------------------------------------
-
             if (Config.isDev) {
-                // this.meshHelper = new MeshHelper(this.scene, this.model.obj);
-                //
-                // if (Config.mesh.enableHelper) this.meshHelper.enable();
-
                 this.gui.load(this);
-                this.gui.show();
+                // this.gui.show();
             }
 
             var patternMarker = new THREEAR.PatternMarker({
@@ -142,6 +114,7 @@ export default class Main {
 
             // run the rendering loop
             var lastTimeMsec = 0;
+
             requestAnimationFrame(function animate(nowMsec) {
                 // keep looping
                 requestAnimationFrame(animate);
@@ -152,16 +125,6 @@ export default class Main {
 
                 // call each update function
                 controller.update(source.domElement);
-
-                // cube.rotation.x += deltaMsec/10000 * Math.PI
-                //torus.rotation.y += deltaMsec/1000 * Math.PI
-                //torus.rotation.z += deltaMsec/1000 * Math.PI
-
-                // ----------------------
-                // Render rStats if Dev
-                if (Config.isDev && Config.isShowingStats) {
-                    // Stats.start();
-                }
 
                 // Call render function and pass in created scene and camera
                 renderer.render(scene, camera);
@@ -176,8 +139,8 @@ export default class Main {
                 // window.labelRenderer.render(scene, camera.threeCamera);
 
                 if (Config.isDev && Config.isShowingStats) {
-                     // this.stats.update();
-                 }
+                    // this.stats.update();
+                }
 
                 // Delta time is sometimes needed for certain updates
                 //const delta = this.clock.getDelta();
@@ -194,94 +157,10 @@ export default class Main {
         window.addEventListener('click', this.onDocumentMouseDown, false);
     }
 
-    // constructor(container) {
-    //     // Set container property to container element
-    //     this.container = container;
-    //
-    //     // Start Three clock
-    //     this.clock = new THREE.Clock();
-    //
-    //     // Main scene creation
-    //     scene = new THREE.Scene();
-    //     window.scene = scene; // config as a global variable
-    //
-    //     scene.fog = new THREE.FogExp2(Config.fog.color, Config.fog.near);
-    //
-    //     this.mqtt = new MQTTClient(scene);
-    //
-    //     // Get Device Pixel Ratio first for retina
-    //     if (window.devicePixelRatio) {
-    //         Config.dpr = window.devicePixelRatio;
-    //     }
-    //
-    //     // Main renderer constructor
-    //     this.renderer = new Renderer(scene, container);
-    //
-    //     // Components instantiations
-    //     camera = new Camera(this.renderer.threeRenderer);
-    //
-    //     this.controls = new Controls(camera.threeCamera, container);
-    //     this.light = new Light(scene);
-    //
-    //     // Create and place lights in scene
-    //     const lights = ['ambient', 'directional', 'point', 'hemi'];
-    //     lights.forEach((light) => this.light.place(light));
-    //
-
-    //
-    //     // Instantiate texture class
-    //     this.texture = new Texture();
-    //
-    //     // Start loading the textures and then go on to load the model after the texture Promises have resolved
-    //     this.texture.load().then(() => {
-    //         this.manager = new THREE.LoadingManager();
-    //
-    //
-    //         // -----------------------------------------------------------------
-    //
-    //         // onProgress callback
-    //         this.manager.onProgress = (item, loaded, total) => {
-    //             // console.log(`${item}: ${loaded} ${total}`);
-    //         };
-    //
-    //         // All loaders done now
-    //         this.manager.onLoad = () => {
-    //             alert('Loaded');
-    //
-    //             // Set up interaction manager with the app now that the model is finished loading
-    //             new Interaction(
-    //                 this.renderer.threeRenderer,
-    //                 scene,
-    //                 camera.threeCamera,
-    //                 this.controls.threeControls
-    //             );
-    //
-    //             // Add dat.GUI controls if dev
-    //             if (Config.isDev) {
-    //                 this.meshHelper = new MeshHelper(scene, this.model.obj);
-    //                 if (Config.mesh.enableHelper) this.meshHelper.enable();
-    //                 //this.gui.load(this, this.model.obj);
-    //             }
-    //
-    //             // Everything is now fully loaded
-    //             Config.isLoaded = true;
-    //             this.container.querySelector('#loading').style.display = 'none';
-    //         };
-    //     });
-    //
-    //     // Start render which does not wait for model fully loaded
-    //
-    //     this.render();
-    //     this.container.querySelector('#loading').style.display = 'none';
-    //
-    //     // Add eventlistner for catch mouse click events
-    //     window.addEventListener('click', this.onDocumentMouseDown, false);
-    // }
-
     onDocumentMouseDown(event) {
         event.preventDefault();
 
-        // // Not suppported in AR so far
+        // // Not supported in AR so far
         // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         //
@@ -329,7 +208,7 @@ export default class Main {
     onDocumentMouseMove(event) {
         event.preventDefault();
 
-        // // Not suppoprted in AR so far
+        // // Not supported in AR so far
         // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         //

@@ -60,7 +60,7 @@ You can run any of these individually if you'd like with the `npm run` command:
 
 ## Latest build
 
-You can see the latest deployment of this repository from [https://pera-swarm.ce.pdn.ac.lk/visualizer/](https://pera-swarm.ce.pdn.ac.lk/visualizer/)
+You can see the latest deployment of this repository from [https://pera-swarm.github.io/visualizer-ar/](https://pera-swarm.github.io/visualizer-ar/)
 
 ## Additional Reads
 

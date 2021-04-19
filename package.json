@@ -1,7 +1,7 @@
 {
     "name": "pera-swarm-visualizer-ar",
     "version": "1.0.0",
-    "description": "The GUI visualizor for Pera Swarm Project using AR",
+    "description": "The GUI visualizer for Pera Swarm Project using AR",
     "private": "false",
     "main": "app.js",
     "engines": {
@@ -25,15 +25,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Pera-Swarm/visualizer.git"
+        "url": "git+https://github.com/Pera-Swarm/visualizer+ar.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Pera-Swarm/visualizer-vr/issues"
+        "url": "https://github.com/Pera-Swarm/visualizer-ar/issues"
     },
-    "homepage": "https://pera-swarm.github.io/visualizer-vr",
+    "homepage": "https://pera-swarm.github.io/visualizer-ar",
     "devDependencies": {
         "@babel/core": "^7.10.4",
         "@babel/preset-env": "^7.10.4",

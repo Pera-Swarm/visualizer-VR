@@ -1,11 +1,9 @@
-import * as THREE from 'three';
-import TWEEN, { update } from '@tweenjs/tween.js';
-
 import Config from '../../data/config';
 import MQTT from 'paho-mqtt';
 
 import Obstacle from '../components/obstacle';
 import Robot from '../components/robot';
+
 import { getCredentials } from '../helpers/urlHelper';
 
 // -----------------------------------------------------------------------------
@@ -59,8 +57,8 @@ export default class MQTTClient {
         } else {
             const { username, password } = credentials;
             // create a random client Id
-            const client_id = 'client_' + Math.random().toString(36).substring(2, 15);
-            this.client = new MQTT.Client(Config.mqtt.server, Config.mqtt.port, Config.mqtt.path, client_id);
+            const clientId = 'client_' + Math.random().toString(36).substring(2, 15);
+            this.client = new MQTT.Client(Config.mqtt.server, Config.mqtt.port, Config.mqtt.path, clientId);
 
             window.mqtt = this.client;
 
@@ -112,7 +110,6 @@ export default class MQTTClient {
     updateChannel() {
         const channelHash = window.location.hash;
         if ((channelHash != '') & (channelHash.length > 1)) {
-            // window.channel = channelHash.substring(1);
             window.channel = channelHash.split('#')[1].split('?')[0];
         } else {
             window.channel = Config.mqtt.channel;
@@ -181,7 +178,6 @@ export default class MQTTClient {
             } catch (e) {
                 console.error(e);
             }
-
         } else if (topic == TOPIC_OBSTACLES_LIST) {
             // Create obstacles in the arena
             try {
@@ -190,17 +186,14 @@ export default class MQTTClient {
             } catch (e) {
                 console.error(e);
             }
-
         } else if (topic == TOPIC_OBSTACLES_DELETE) {
             // Delete obstacle given in the id
             const data = JSON.parse(msg);
             console.log(data);
             window.obstacles.deleteIfExists(data.id);
-
         } else if (topic == TOPIC_OBSTACLES_DELETE_ALL) {
             // Delete all obstacles
             window.obstacles.deleteAll();
-
         } else if (topic == TOPIC_CHANGE_COLOR) {
             try {
                 const data = JSON.parse(msg);
@@ -208,7 +201,6 @@ export default class MQTTClient {
             } catch (e) {
                 console.error(e);
             }
-
         } else if (topic == TOPIC_ROBOT_BROADCAST) {
             // Display a popup message
             // TODO: Do this by a generalized function call
@@ -245,7 +237,6 @@ export default class MQTTClient {
             } else {
                 console.log('>Management:', msg);
             }
-
         } else if (msg.startsWith('MSG')) {
             const m = 'Notice: ' + msg.substring(4);
             const t = 2000 + m.length * 95;
@@ -261,7 +252,6 @@ export default class MQTTClient {
             }, t);
         } else {
         }
-
     }
 
     subscribe(topic, callback) {
