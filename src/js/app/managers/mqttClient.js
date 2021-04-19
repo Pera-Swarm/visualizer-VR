@@ -1,11 +1,9 @@
-import * as THREE from 'three';
-import TWEEN, { update } from '@tweenjs/tween.js';
-
 import Config from '../../data/config';
 import MQTT from 'paho-mqtt';
 
 import Obstacle from '../components/obstacle';
 import Robot from '../components/robot';
+
 import { getCredentials } from '../helpers/urlHelper';
 
 // -----------------------------------------------------------------------------
@@ -59,8 +57,8 @@ export default class MQTTClient {
         } else {
             const { username, password } = credentials;
             // create a random client Id
-            const client_id = 'client_' + Math.random().toString(36).substring(2, 15);
-            this.client = new MQTT.Client(Config.mqtt.server, Config.mqtt.port, Config.mqtt.path, client_id);
+            const clientId = 'client_' + Math.random().toString(36).substring(2, 15);
+            this.client = new MQTT.Client(Config.mqtt.server, Config.mqtt.port, Config.mqtt.path, clientId);
 
             window.mqtt = this.client;
 
@@ -112,7 +110,6 @@ export default class MQTTClient {
     updateChannel() {
         const channelHash = window.location.hash;
         if ((channelHash != '') & (channelHash.length > 1)) {
-            // window.channel = channelHash.substring(1);
             window.channel = channelHash.split('#')[1].split('?')[0];
         } else {
             window.channel = Config.mqtt.channel;

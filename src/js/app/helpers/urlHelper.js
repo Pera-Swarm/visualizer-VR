@@ -17,9 +17,6 @@ function getUrlParam(parameter, defaultvalue) {
 }
 
 export function getCredentials() {
-    // TODO: Add channel, host and port into URL (as optional parameters)
-    // Suggestion: Use JWT insted of exposed credentials
-    // Simulator server can provide the JWT token
     const storedCredentials = localStorage.getItem('pera-swarm-credentials');
     const key = getUrlParam('key', false);
 

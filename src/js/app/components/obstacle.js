@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import TWEEN, { update } from '@tweenjs/tween.js';
 
 import Config from '../../data/config';
 import { addLabel, removeLabel } from './label';
@@ -49,10 +48,8 @@ export default class Obstacle {
         mesh.reality = reality; // set reality flag
 
         if (mesh.reality === 'V') {
-            // material.visible = Config.selectedRealities.virtual;
             material.opacity = Config.selectedRealities.virtual ? 1.0 : Config.hiddenOpacity;
         } else if (mesh.reality === 'R') {
-            // material.visible = Config.selectedRealities.real;
             material.opacity = Config.selectedRealities.real ? 1.0 : Config.hiddenOpacity;
         }
 

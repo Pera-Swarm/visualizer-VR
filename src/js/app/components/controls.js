@@ -44,7 +44,6 @@ export default class Controls {
             this.threeControls.maxAzimuthAngle = Config.controls.maxAzimuthAngle;
         }
 
-
         /*this.threeControls.mouseButtons = {
             LEFT: THREE.MOUSE.ROTATE,
             MIDDLE: THREE.MOUSE.DOLLY,

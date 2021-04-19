@@ -8,7 +8,6 @@ export default class Environment {
         console.log(`Environment: Scale: ${scene_scale}, arenaSize:${Config.arena.size}`);
 
         var geometry = new THREE.PlaneBufferGeometry(Config.arena.size, Config.arena.size);
-        // var material = new THREE.MeshPhongMaterial({
         var material = new THREE.MeshStandardMaterial({
             color: 0x999999,
             depthWrite: false,
@@ -38,18 +37,19 @@ export default class Environment {
         markerGroup.add(grid);
 
         // Zero marker
-        const zeroGeometry = new THREE.SphereGeometry(scene_scale * 5, 16, 16);
+        const zeroGeometry = new THREE.SphereGeometry(5, 16, 16);
         const zeroMarker = new THREE.Mesh(zeroGeometry, new THREE.MeshBasicMaterial({ color: 0xffff00 }));
+        zeroMarker.name = 'zeroMarker';
+        zeroMarker.scale.set(scene_scale, scene_scale, scene_scale);
         zeroMarker.visible = Config.offsets.showZeroMarker;
         markerGroup.add(zeroMarker);
         window.zeroMarker = zeroMarker;
 
-        const markerGeometry = new THREE.SphereGeometry(5, 16, 16);
+        const markerGeometry = new THREE.SphereGeometry(2.5, 16, 16);
         const coordMarker = new THREE.Mesh(markerGeometry, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+        coordMarker.name = 'coordinateMarker';
         coordMarker.position.set(posX, posY, posZ);
         coordMarker.scale.set(scene_scale, scene_scale, scene_scale);
-
-        coordMarker.name = 'coordinateMarker';
         coordMarker.visible = Config.offsets.showCoordMarker;
         markerGroup.add(coordMarker);
         window.coordMarker = coordMarker;

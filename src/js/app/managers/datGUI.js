@@ -1,21 +1,11 @@
 import Config, { saveConfig } from '../../data/config';
 import { transformPosition, transformScale, transformRotation } from '../helpers/coordinateTransform';
 
-// COMMENT(NuwanJ)
-// Store the last state of the toggles in the window.localStorage
-// Refer: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
-// Refer: https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+useLocalStorage
-
 // Manages all dat.GUI interactions
 export default class DatGUI {
     constructor(main) {
         this.gui = new dat.GUI();
-
         this.gui.useLocalStorage = true;
-
-        // this.camera = main.camera.threeCamera;
-        // this.controls = main.controls.threeControls;
-        // this.light = main.light;
     }
 
     load(main, mesh) {
@@ -156,9 +146,6 @@ export default class DatGUI {
         /* Global */
         this.gui.open();
         // this.gui.close();
-
-        // this.model = main.model;
-        // this.meshHelper = main.meshHelper;
     }
 
     toggleLabels(objects, type, value) {
@@ -196,10 +183,6 @@ export default class DatGUI {
         const pos = window.coordMarker.position;
         const { posX, posY, posZ } = transformPosition(pos.x, pos.y, pos.z, scene_scale);
         window.coordMarker.position.set(posX, posY, posZ);
-    }
-
-    show() {
-        // this.gui.show();
     }
 
     unload() {
