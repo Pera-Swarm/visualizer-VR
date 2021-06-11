@@ -57,6 +57,7 @@ You can run any of these individually if you'd like with the `npm run` command:
 * Arrow controls will pan
 * Mouse left click will rotate/right click will pan
 * Scroll wheel zooms in and out
+* Control box can be used to change settings 
 
 ## Latest build
 
