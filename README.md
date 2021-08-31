@@ -1,5 +1,5 @@
-![Webpack CI](https://github.com/Pera-Swarm/visualizer-vr/workflows/Webpack%20CI/badge.svg)
-
+![Webpack CI](https://github.com/Pera-Swarm/visualizer-ar/workflows/Webpack%20CI/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A basic boilerplate for a Three.js project including the use of Webpack and ES6 syntax via Babel.
 
@@ -57,6 +57,7 @@ You can run any of these individually if you'd like with the `npm run` command:
 * Arrow controls will pan
 * Mouse left click will rotate/right click will pan
 * Scroll wheel zooms in and out
+* Control box can be used to change settings 
 
 ## Latest build
 
